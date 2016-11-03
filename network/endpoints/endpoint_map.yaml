@@ -31,6 +31,9 @@ parameters:
       CinderAdmin: {protocol: http, port: '8776', host: IP_ADDRESS}
       CinderInternal: {protocol: http, port: '8776', host: IP_ADDRESS}
       CinderPublic: {protocol: http, port: '8776', host: IP_ADDRESS}
+      ContrailConfigAdmin: {protocol: http, port: '8082', host: IP_ADDRESS}
+      ContrailConfigInternal: {protocol: http, port: '8082', host: IP_ADDRESS}
+      ContrailConfigPublic: {protocol: http, port: '8082', host: IP_ADDRESS}
       GlanceAdmin: {protocol: http, port: '9292', host: IP_ADDRESS}
       GlanceInternal: {protocol: http, port: '9292', host: IP_ADDRESS}
       GlancePublic: {protocol: http, port: '9292', host: IP_ADDRESS}
@@ -1550,6 +1553,249 @@ outputs:
                         template: NETWORK_uri
             - ':'
             - get_param: [EndpointMap, CinderPublic, port]
+      ContrailConfigAdmin:
+        host:
+          str_replace:
+            template:
+              get_param: [EndpointMap, ContrailConfigAdmin, host]
+            params:
+              CLOUDNAME:
+                get_param:
+                - CloudEndpoints
+                - get_param: [ServiceNetMap, ContrailConfigNetwork]
+              IP_ADDRESS:
+                get_param:
+                - NetIpMap
+                - str_replace:
+                    params:
+                      NETWORK:
+                        get_param: [ServiceNetMap, ContrailConfigNetwork]
+                    template: NETWORK_uri
+        host_nobrackets:
+          str_replace:
+            template:
+              get_param: [EndpointMap, ContrailConfigAdmin, host]
+            params:
+              CLOUDNAME:
+                get_param:
+                - CloudEndpoints
+                - get_param: [ServiceNetMap, ContrailConfigNetwork]
+              IP_ADDRESS:
+                get_param:
+                - NetIpMap
+                - get_param: [ServiceNetMap, ContrailConfigNetwork]
+        port:
+          get_param: [EndpointMap, ContrailConfigAdmin, port]
+        protocol:
+          get_param: [EndpointMap, ContrailConfigAdmin, protocol]
+        uri:
+          list_join:
+          - ''
+          - - get_param: [EndpointMap, ContrailConfigAdmin, protocol]
+            - ://
+            - str_replace:
+                template:
+                  get_param: [EndpointMap, ContrailConfigAdmin, host]
+                params:
+                  CLOUDNAME:
+                    get_param:
+                    - CloudEndpoints
+                    - get_param: [ServiceNetMap, ContrailConfigNetwork]
+                  IP_ADDRESS:
+                    get_param:
+                    - NetIpMap
+                    - str_replace:
+                        params:
+                          NETWORK:
+                            get_param: [ServiceNetMap, ContrailConfigNetwork]
+                        template: NETWORK_uri
+            - ':'
+            - get_param: [EndpointMap, ContrailConfigAdmin, port]
+        uri_no_suffix:
+          list_join:
+          - ''
+          - - get_param: [EndpointMap, ContrailConfigAdmin, protocol]
+            - ://
+            - str_replace:
+                template:
+                  get_param: [EndpointMap, ContrailConfigAdmin, host]
+                params:
+                  CLOUDNAME:
+                    get_param:
+                    - CloudEndpoints
+                    - get_param: [ServiceNetMap, ContrailConfigNetwork]
+                  IP_ADDRESS:
+                    get_param:
+                    - NetIpMap
+                    - str_replace:
+                        params:
+                          NETWORK:
+                            get_param: [ServiceNetMap, ContrailConfigNetwork]
+                        template: NETWORK_uri
+            - ':'
+            - get_param: [EndpointMap, ContrailConfigAdmin, port]
+      ContrailConfigInternal:
+        host:
+          str_replace:
+            template:
+              get_param: [EndpointMap, ContrailConfigInternal, host]
+            params:
+              CLOUDNAME:
+                get_param:
+                - CloudEndpoints
+                - get_param: [ServiceNetMap, ContrailConfigNetwork]
+              IP_ADDRESS:
+                get_param:
+                - NetIpMap
+                - str_replace:
+                    params:
+                      NETWORK:
+                        get_param: [ServiceNetMap, ContrailConfigNetwork]
+                    template: NETWORK_uri
+        host_nobrackets:
+          str_replace:
+            template:
+              get_param: [EndpointMap, ContrailConfigInternal, host]
+            params:
+              CLOUDNAME:
+                get_param:
+                - CloudEndpoints
+                - get_param: [ServiceNetMap, ContrailConfigNetwork]
+              IP_ADDRESS:
+                get_param:
+                - NetIpMap
+                - get_param: [ServiceNetMap, ContrailConfigNetwork]
+        port:
+          get_param: [EndpointMap, ContrailConfigInternal, port]
+        protocol:
+          get_param: [EndpointMap, ContrailConfigInternal, protocol]
+        uri:
+          list_join:
+          - ''
+          - - get_param: [EndpointMap, ContrailConfigInternal, protocol]
+            - ://
+            - str_replace:
+                template:
+                  get_param: [EndpointMap, ContrailConfigInternal, host]
+                params:
+                  CLOUDNAME:
+                    get_param:
+                    - CloudEndpoints
+                    - get_param: [ServiceNetMap, ContrailConfigNetwork]
+                  IP_ADDRESS:
+                    get_param:
+                    - NetIpMap
+                    - str_replace:
+                        params:
+                          NETWORK:
+                            get_param: [ServiceNetMap, ContrailConfigNetwork]
+                        template: NETWORK_uri
+            - ':'
+            - get_param: [EndpointMap, ContrailConfigInternal, port]
+        uri_no_suffix:
+          list_join:
+          - ''
+          - - get_param: [EndpointMap, ContrailConfigInternal, protocol]
+            - ://
+            - str_replace:
+                template:
+                  get_param: [EndpointMap, ContrailConfigInternal, host]
+                params:
+                  CLOUDNAME:
+                    get_param:
+                    - CloudEndpoints
+                    - get_param: [ServiceNetMap, ContrailConfigNetwork]
+                  IP_ADDRESS:
+                    get_param:
+                    - NetIpMap
+                    - str_replace:
+                        params:
+                          NETWORK:
+                            get_param: [ServiceNetMap, ContrailConfigNetwork]
+                        template: NETWORK_uri
+            - ':'
+            - get_param: [EndpointMap, ContrailConfigInternal, port]
+      ContrailConfigPublic:
+        host:
+          str_replace:
+            template:
+              get_param: [EndpointMap, ContrailConfigPublic, host]
+            params:
+              CLOUDNAME:
+                get_param:
+                - CloudEndpoints
+                - get_param: [ServiceNetMap, PublicNetwork]
+              IP_ADDRESS:
+                get_param:
+                - NetIpMap
+                - str_replace:
+                    params:
+                      NETWORK:
+                        get_param: [ServiceNetMap, PublicNetwork]
+                    template: NETWORK_uri
+        host_nobrackets:
+          str_replace:
+            template:
+              get_param: [EndpointMap, ContrailConfigPublic, host]
+            params:
+              CLOUDNAME:
+                get_param:
+                - CloudEndpoints
+                - get_param: [ServiceNetMap, PublicNetwork]
+              IP_ADDRESS:
+                get_param:
+                - NetIpMap
+                - get_param: [ServiceNetMap, PublicNetwork]
+        port:
+          get_param: [EndpointMap, ContrailConfigPublic, port]
+        protocol:
+          get_param: [EndpointMap, ContrailConfigPublic, protocol]
+        uri:
+          list_join:
+          - ''
+          - - get_param: [EndpointMap, ContrailConfigPublic, protocol]
+            - ://
+            - str_replace:
+                template:
+                  get_param: [EndpointMap, ContrailConfigPublic, host]
+                params:
+                  CLOUDNAME:
+                    get_param:
+                    - CloudEndpoints
+                    - get_param: [ServiceNetMap, PublicNetwork]
+                  IP_ADDRESS:
+                    get_param:
+                    - NetIpMap
+                    - str_replace:
+                        params:
+                          NETWORK:
+                            get_param: [ServiceNetMap, PublicNetwork]
+                        template: NETWORK_uri
+            - ':'
+            - get_param: [EndpointMap, ContrailConfigPublic, port]
+        uri_no_suffix:
+          list_join:
+          - ''
+          - - get_param: [EndpointMap, ContrailConfigPublic, protocol]
+            - ://
+            - str_replace:
+                template:
+                  get_param: [EndpointMap, ContrailConfigPublic, host]
+                params:
+                  CLOUDNAME:
+                    get_param:
+                    - CloudEndpoints
+                    - get_param: [ServiceNetMap, PublicNetwork]
+                  IP_ADDRESS:
+                    get_param:
+                    - NetIpMap
+                    - str_replace:
+                        params:
+                          NETWORK:
+                            get_param: [ServiceNetMap, PublicNetwork]
+                        template: NETWORK_uri
+            - ':'
+            - get_param: [EndpointMap, ContrailConfigPublic, port]
       GlanceAdmin:
         host:
           str_replace:

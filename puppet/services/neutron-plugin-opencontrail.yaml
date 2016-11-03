@@ -29,10 +29,19 @@ parameters:
   ContrailApiServerIp:
     description: IP address of the OpenContrail API server
     type: string
+    default: '127.0.0.1'
   ContrailApiServerPort:
     description: Port of the OpenContrail API
     type: string
     default: 8082
+  ContrailAuthProtocol:
+    description: Auth Protocol for Keystome
+    type: string
+    default: http
+  ContrailAuthPort:
+    description: Auth Port for Keystome
+    type: number
+    default: 35357
   ContrailMultiTenancy:
     description: Whether to enable multi tenancy
     type: boolean
@@ -61,10 +70,14 @@ outputs:
           - get_attr: [NeutronBase, role_data, config_settings]
           - neutron::api_extensions_path: /usr/lib/python2.7/site-packages/neutron_plugin_contrail/extensions
 
-            neutron::plugins::opencontrail::api_server_ip: {get_param: ContrailApiServerIp}
+            neutron::plugins::opencontrail::api_server_ip: {get_param: [EndpointMap, ContrailConfigInternal, host] }
+            #neutron::plugins::opencontrail::api_server_ip: {get_param: ContrailApiServerIp}
             neutron::plugins::opencontrail::api_server_port: {get_param: ContrailApiServerPort}
             neutron::plugins::opencontrail::multi_tenancy: {get_param: ContrailMultiTenancy}
             neutron::plugins::opencontrail::contrail_extensions: {get_param: ContrailExtensions}
+            neutron::plugins::opencontrail::keystone_auth_host: {get_param: [EndpointMap, KeystoneInternal, host] }
+            neutron::plugins::opencontrail::keystone_auth_protocol: {get_param: ContrailAuthProtocol}
+            neutron::plugins::opencontrail::keystone_auth_port: {get_param: ContrailAuthPort}
             neutron::plugins::opencontrail::keystone_auth_url: {get_param: [EndpointMap, KeystoneInternal, uri] }
             neutron::plugins::opencontrail::keystone_admin_user: admin
             neutron::plugins::opencontrail::keystone_admin_tenant_name: admin

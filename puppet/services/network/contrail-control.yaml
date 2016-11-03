@@ -30,6 +30,10 @@ parameters:
   ContrailControlIfmapUserPassword:
     description: Ifmap user password
     type: string
+  ContrailControlRNDCSecret:
+    description: RNDCSecret
+    default: sHE1SM8nsySdgsoRxwARtA==
+    type: string
 
 resources:
   ContrailBase:
@@ -50,5 +54,6 @@ outputs:
           - contrail::control::host_ip: {get_param: ContrailControlHostIP}
             contrail::control::ifmap_username: {get_param: ContrailControlIfmapUserName}
             contrail::control::ifmap_password: {get_param: ContrailControlIfmapUserPassword}
+            contrail::control::rndc_secret: {get_param: ContrailControlRNDCSecret}
       step_config: |
         include ::tripleo::network::contrail::control

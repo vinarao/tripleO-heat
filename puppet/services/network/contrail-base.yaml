@@ -75,6 +75,26 @@ parameters:
     default: []
     description: List of zookeeper servers
     type: comma_delimited_list
+  ContrailZkHostnames:
+    default: []
+    description: List of zookeeper server hostnames
+    type: comma_delimited_list
+  RabbitClientPort:
+    default: 5672
+    description: RabbitMQClientPort
+    type: number
+  RabbitServer:
+    default: '127.0.0.1'
+    description: RabbitMQ server ip
+    type: string
+  RabbitUserName:
+    default: 'guest'
+    description: RabbitMQ username
+    type: string
+  RabbitPassword:
+    default: 'guest'
+    description: RabbitMQ password
+    type: string
 
 outputs:
   role_data:
@@ -97,4 +117,9 @@ outputs:
         contrail::insecure: {get_param: ContrailInsecure}
         contrail::memcached_server: {get_param: ContrailMemcachedServer}
         contrail::multi_tenancy: {get_param: ContrailMultiTenancy}
+        contrail::rabbit_password: {get_param: RabbitPassword}
+        contrail::rabbit_server: {get_param: [EndpointMap, KeystoneInternal, host] }
+        contrail::rabbit_user: {get_param: RabbitUserName}
+        contrail::rabbit_port: {get_param: RabbitClientPort}
         contrail::zk_server_ip: {get_param: ContrailZkServerIp}
+        contrail::zk_hostnames: {get_param: ContrailZkHostnames}

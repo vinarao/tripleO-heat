@@ -30,9 +30,6 @@ parameters:
   ContrailConfigIfmapUserPassword:
     description: Ifmap user password
     type: string
-  ContrailConfigRabbitServerIp:
-    description: RabbitMq server ip address
-    type: string
   ContrailConfigRedisServerIp:
     description: Redis server ip address
     type: string
@@ -66,7 +63,6 @@ outputs:
             contrail::config::ifmap_username: {get_param: ContrailConfigIfmapUserName}
             contrail::config::listen_ip_address: {get_param: ContrailConfigListenAddress}
             contrail::config::listen_port: {get_param: ContrailConfigListenPort}
-            contrail::config::rabbit_server: {get_param: ContrailConfigRabbitServerIp}
             contrail::config::redis_server: {get_param: ContrailConfigRedisServerIp}
       step_config: |
         include ::tripleo::network::contrail::config

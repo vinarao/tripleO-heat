@@ -63,7 +63,7 @@ outputs:
             contrail::webui::contrail_config_vip: {get_param: ContrailWebUiConfigVip}
             contrail::webui::contrail_webui_http_port: {get_param: ContrailWebuiHttpPort}
             contrail::webui::contrail_webui_https_port: {get_param: ContrailWebuiHttpsPort}
-            contrail::webui::neutron_vip: {get_param: ContrailWebUiNeutronVip}
+            contrail::webui::neutron_vip: {get_param: [EndpointMap, NeutronInternal, host] }
             contrail::webui::redis_ip: {get_param: ContrailWebUiRedisIp}
       step_config: |
         include ::tripleo::network::contrail::webui

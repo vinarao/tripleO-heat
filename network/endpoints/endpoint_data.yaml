@@ -19,6 +19,15 @@ Ceilometer:
         net_param: CeilometerApi
     port: 8777
 
+ContrailConfig:
+    Internal:
+        net_param: ContrailConfig
+    Public:
+        net_param: Public
+    Admin:
+        net_param: ContrailConfig
+    port: 8082
+
 Gnocchi:
     Internal:
         net_param: GnocchiApi

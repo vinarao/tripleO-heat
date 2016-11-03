@@ -28,6 +28,14 @@ parameters:
     description: Minimum disk size for database
     type: number
     default: 64
+  ContrailZookeeperServiceName:
+    description: Zookeeper service name
+    type: string
+    default: zookeeper
+  ContrailZookeeperPackageName:
+    default: ["zookeeper"]
+    description: Zookeeper packages
+    type: comma_delimited_list
 
 resources:
   ContrailBase:
@@ -47,5 +55,7 @@ outputs:
           - get_attr: [ContrailBase, role_data, config_settings]
           - contrail::database::host_ip: {get_param: ContrailDatabaseHostIP}
             contrail::database::minimum_diskGB: {get_param: ContrailDatabaseMinDisk}
+            zookeeper::params::service_name: {get_param: ContrailZookeeperServiceName}
+            zookeeper::params::packages: {get_param: ContrailZookeeperPackageName}
       step_config: |
-        include ::tripleo::profile::contrail::database
+        include ::tripleo::network::contrail::database

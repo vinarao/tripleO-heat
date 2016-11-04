@@ -1,0 +1,26 @@
+heat_template_version: 2015-10-15
+
+description: Register Contrail Components
+
+parameters:
+  # Parameters passed from the parent template
+  servers:
+    type: json
+
+resources:
+  ContrailRegisterDeployment:
+    type: OS::Heat::SoftwareDeployment
+    properties:
+      name: ContrailRegisterDeployment
+      server:  {get_param: [servers, ContrailController, '0']}
+      #config: {get_resource: ContrailControllerConfig}
+      #
+      #
+outputs:
+  role_data:
+    description: Register Contrail Components
+    value:
+      service_name: contrail_register
+      step_config: |
+        include ::tripleo::network::contrail::register
+

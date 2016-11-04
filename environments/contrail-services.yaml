@@ -1,4 +1,5 @@
 parameter_defaults:
+  NovaImage: overcloud-full-compute
   AdminPassword: admin
   AdminTenantName: admin
   AdminToken: admin

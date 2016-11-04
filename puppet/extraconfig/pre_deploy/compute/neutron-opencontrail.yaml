@@ -9,6 +9,7 @@ parameters:
   ContrailApiServerIp:
     description: IP address of the OpenContrail API server
     type: string
+    default: '127.0.0.1'
   ContrailApiServerPort:
     description: Port of the OpenContrail API
     type: string

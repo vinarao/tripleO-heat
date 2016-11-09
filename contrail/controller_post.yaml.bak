@@ -1,0 +1,94 @@
+heat_template_version: 2015-10-15
+
+# See https://github.com/openstack/tripleo-heat-templates/blob/master/puppet/post.j2.yaml#L136
+# To enable this include an environment file like:
+# resource_registry:
+#   OS::TripleO::NodeExtraConfigPost: thisfile.yaml
+
+description: Register Contrail Components
+
+parameters:
+  # Parameters passed from the parent template
+  servers:
+    type: json
+
+  # This is provided via parameter_defaults from tripleoclient
+  # it changes to a new timestamp every update, so we can use it to
+  # trigger the deployment to run even though it and the config are
+  # otherwise unchanged
+  DeployIdentifier:
+    type: string
+
+  ConfigDebug:
+    default: false
+    description: Whether to run config management (e.g. Puppet) in debug mode.
+    type: boolean
+
+resources:
+  ContrailRegisterDeployment:
+    type: OS::Heat::SoftwareDeploymentGroup
+    properties:
+      name: ContrailRegisterDeployment
+      servers:  {get_param: [servers, ContrailController]}
+      config: {get_resource: ContrailControllerConfig}
+
+  BlockStorageExtraConfigPost:
+    type: OS::Heat::SoftwareDeploymentGroup
+    properties:
+      name: BlockStorageExtraConfigPost
+      servers:  {get_param: [servers, ContrailController]}
+      config: {get_resource: DummyConfig}
+
+  ControllerExtraConfigPost:
+    type: OS::Heat::SoftwareDeploymentGroup
+    properties:
+      name: ControllerExtraConfigPost
+      servers:  {get_param: [servers, ContrailController]}
+      config: {get_resource: DummyConfig}
+
+  ComputeExtraConfigPost:
+    type: OS::Heat::SoftwareDeploymentGroup
+    properties:
+      name: ComputeExtraConfigPost
+      servers:  {get_param: [servers, ContrailController]}
+      config: {get_resource: DummyConfig}
+
+  CephStorageExtraConfigPost:
+    type: OS::Heat::SoftwareDeploymentGroup
+    properties:
+      name: CephStorageExtraConfigPost
+      servers:  {get_param: [servers, ContrailController]}
+      config: {get_resource: DummyConfig}
+
+  ContrailControllerExtraConfigPost:
+    type: OS::Heat::SoftwareDeploymentGroup
+    properties:
+      name: ContrailControllerExtraConfigPost
+      servers:  {get_param: [servers, ContrailController]}
+      config: {get_resource: DummyConfig}
+
+  DummyConfig:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: puppet
+      options:
+        enable_debug: {get_param: ConfigDebug}
+        enable_hiera: True
+        enable_facter: False
+        #modulepath: /etc/puppet/modules:/opt/stack/puppet-modules:/usr/share/openstack-puppet/modules
+      inputs:
+        - name: deploy_identifier
+
+  ContrailControllerConfig:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: puppet
+      options:
+        enable_debug: {get_param: ConfigDebug}
+        enable_hiera: True
+        enable_facter: False
+        #modulepath: /etc/puppet/modules:/opt/stack/puppet-modules:/usr/share/openstack-puppet/modules
+      inputs:
+        - name: deploy_identifier
+      config: |
+        include ::tripleo::network::contrail::register

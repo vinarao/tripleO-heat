@@ -20,5 +20,6 @@ parameter_defaults:
   ContrailDatabaseHostIP: 127.0.0.1
   ContrailWebUiAnalyticsVip: 127.0.0.1
   ContrailWebUiConfigVip: 127.0.0.1
-  ContrailControllerCount: 1
+  ContrailControllerCount: 3
   ContrailControllerImage: overcloud-contrail
+  NtpServer: 10.84.5.100

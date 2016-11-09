@@ -10,7 +10,11 @@ resource_registry:
   # Override the NeutronCorePlugin to use Nuage
   OS::TripleO::Services::NeutronCorePlugin: OS::TripleO::Services::NeutronCorePluginOpencontrail
   OS::TripleO::Services::ComputeNeutronCorePlugin: ../puppet/services/neutron-compute-plugin-opencontrail.yaml
-  OS::TripleO::AllNodesExtraConfig: ../puppet/extraconfig/all_nodes/neutron-opencontrail-all-nodes.yaml
+  # OS::TripleO::AllNodesExtraConfig: ../puppet/extraconfig/all_nodes/neutron-opencontrail-all-nodes.yaml
+  # OS::TripleO::AllNodesExtraConfig: ../puppet/extraconfig/all_nodes/neutron-opencontrail-all-nodes.yaml
+  # OS::TripleO::NodeExtraConfigPost: ../extraconfig/post_deploy/neutron-opencontrail-all-nodes.yaml
+  #OS::TripleO::NodeExtraConfigPost: ../contrail/controller_post.yaml
+  #OS::TripleO::ContrailControllerExtraConfigPost: ../contrail/controller_post.yaml
 
 parameter_defaults:
   NeutronCorePlugin: neutron_plugin_contrail.plugins.opencontrail.contrail_plugin.NeutronPluginContrailCoreV2

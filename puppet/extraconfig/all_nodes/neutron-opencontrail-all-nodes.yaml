@@ -12,7 +12,7 @@ resources:
     type: OS::Heat::SoftwareDeployment
     properties:
       name: ContrailRegisterDeployment
-      server:  {get_param: [servers, ContrailController, '0']}
+      servers:  {get_param: [servers, ContrailController]}
       #config: {get_resource: ContrailControllerConfig}
       #
       #

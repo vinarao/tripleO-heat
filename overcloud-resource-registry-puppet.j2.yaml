@@ -104,6 +104,7 @@ resource_registry:
   OS::Tripleo::Services::ContrailControl: puppet/services/network/contrail-control.yaml
   OS::Tripleo::Services::ContrailDatabase: puppet/services/network/contrail-database.yaml
   OS::Tripleo::Services::ContrailWebUI: puppet/services/network/contrail-webui.yaml
+  OS::Tripleo::Services::ContrailProvision: puppet/services/network/contrail-provision.yaml
   OS::TripleO::Services::BlockStorageCinderVolume: puppet/services/cinder-volume.yaml
   OS::TripleO::Services::Core: OS::Heat::None
   OS::TripleO::Services::Keystone: puppet/services/keystone.yaml

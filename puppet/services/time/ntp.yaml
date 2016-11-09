@@ -25,6 +25,14 @@ parameters:
     default: []
     description: NTP servers
     type: comma_delimited_list
+  NtpServiceEnable:
+    default: true
+    description: Enable NTP service
+    type: boolean
+  NtpServiceEnsure:
+    default: 'running'
+    description: Ensure NTP service is running
+    type: string
 
 outputs:
   role_data:
@@ -33,6 +41,8 @@ outputs:
       service_name: ntp
       config_settings:
         ntp::servers: {get_param: NtpServer}
+        ntp::service_enable: {get_param: NtpServiceEnable}
+        ntp::service_ensure: {get_param: NtpServiceEnsure}
         tripleo.ntp.firewall_rules:
           '105 ntp':
             dport: 123

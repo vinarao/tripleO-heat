@@ -99,12 +99,12 @@ resource_registry:
   OS::TripleO::Services::CinderBackup: OS::Heat::None
   OS::TripleO::Services::CinderScheduler: puppet/services/cinder-scheduler.yaml
   OS::TripleO::Services::CinderVolume: puppet/services/cinder-volume.yaml
-  OS::Tripleo::Services::ContrailAnalytics: puppet/services/network/contrail-analytics.yaml
-  OS::Tripleo::Services::ContrailConfig: puppet/services/network/contrail-config.yaml
-  OS::Tripleo::Services::ContrailControl: puppet/services/network/contrail-control.yaml
-  OS::Tripleo::Services::ContrailDatabase: puppet/services/network/contrail-database.yaml
-  OS::Tripleo::Services::ContrailWebUI: puppet/services/network/contrail-webui.yaml
-  OS::Tripleo::Services::ContrailProvision: puppet/services/network/contrail-provision.yaml
+  OS::TripleO::Services::ContrailAnalytics: puppet/services/network/contrail-analytics.yaml
+  OS::TripleO::Services::ContrailConfig: puppet/services/network/contrail-config.yaml
+  OS::TripleO::Services::ContrailControl: puppet/services/network/contrail-control.yaml
+  OS::TripleO::Services::ContrailDatabase: puppet/services/network/contrail-database.yaml
+  OS::TripleO::Services::ContrailWebUI: puppet/services/network/contrail-webui.yaml
+  OS::TripleO::Services::ContrailProvision: puppet/services/network/contrail-provision.yaml
   OS::TripleO::Services::BlockStorageCinderVolume: puppet/services/cinder-volume.yaml
   OS::TripleO::Services::Core: OS::Heat::None
   OS::TripleO::Services::Keystone: puppet/services/keystone.yaml
@@ -174,12 +174,12 @@ resource_registry:
   # Services that are disabled by default (use relevant environment files):
   OS::TripleO::Services::FluentdClient: OS::Heat::None
   OS::TripleO::LoggingConfiguration: puppet/services/logging/fluentd-config.yaml
-  OS::Tripleo::Services::ManilaApi: OS::Heat::None
-  OS::Tripleo::Services::ManilaScheduler: OS::Heat::None
-  OS::Tripleo::Services::ManilaShare: OS::Heat::None
-  OS::Tripleo::Services::ManilaBackendGeneric: OS::Heat::None
-  OS::Tripleo::Services::ManilaBackendNetapp: OS::Heat::None
-  OS::Tripleo::Services::ManilaBackendCephFs: OS::Heat::None
+  OS::TripleO::Services::ManilaApi: OS::Heat::None
+  OS::TripleO::Services::ManilaScheduler: OS::Heat::None
+  OS::TripleO::Services::ManilaShare: OS::Heat::None
+  OS::TripleO::Services::ManilaBackendGeneric: OS::Heat::None
+  OS::TripleO::Services::ManilaBackendNetapp: OS::Heat::None
+  OS::TripleO::Services::ManilaBackendCephFs: OS::Heat::None
   OS::TripleO::Services::ComputeNeutronL3Agent: OS::Heat::None
   OS::TripleO::Services::ComputeNeutronMetadataAgent: OS::Heat::None
   OS::TripleO::Services::AodhApi: puppet/services/aodh-api.yaml

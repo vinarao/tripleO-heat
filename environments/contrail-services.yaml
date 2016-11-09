@@ -1,3 +1,5 @@
+resource_registry:
+  OS::TripleO::Services:Ntp: ../puppet/services/time/ntp.yaml
 parameter_defaults:
   NovaImage: overcloud-full-compute
   AdminPassword: admin

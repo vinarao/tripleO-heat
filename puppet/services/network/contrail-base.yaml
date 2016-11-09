@@ -21,18 +21,23 @@ parameters:
   AdminPassword:
     description: Keystone admin user password
     type: string
+    default: 'admin'
   AdminTenantName:
     description: Keystone admin tenant name
     type: string
+    default: 'admin'
   AdminToken:
     description: Keystone admin token
     type: string
+    default: 'admin'
   AdminUser:
     description: Keystone admin user name
     type: string
+    default: 'admin'
   AuthHost:
     description: Keystone host IP address
     type: string
+    default: '127.0.0.1'
   AuthPort:
     default: 35357
     description: Keystone port
@@ -44,9 +49,11 @@ parameters:
   ContrailDiscoveryServerIp:
     description: Discovery server ip address
     type: string
+    default: '127.0.0.1'
   ContrailKafkaBrokerList:
     description: List of kafka servers
     type: comma_delimited_list
+    default: []
   ContrailAuth:
     default: 'keystone'
     description: Keystone authentication method

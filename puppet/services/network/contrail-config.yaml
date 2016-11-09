@@ -24,15 +24,19 @@ parameters:
   ContrailConfigIfmapServerIp:
     description: Ifmap server ip address
     type: string
+    default: '127.0.0.1'
   ContrailConfigIfmapUserName:
     description: Ifmap user name
     type: string
+    default: 'api'
   ContrailConfigIfmapUserPassword:
     description: Ifmap user password
     type: string
+    default: 'api'
   ContrailConfigRedisServerIp:
     description: Redis server ip address
     type: string
+    default: '127.0.0.1'
   ContrailConfigListenAddress:
     default: '0.0.0.0'
     description: IP address Config API is listening on

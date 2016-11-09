@@ -28,6 +28,7 @@ parameters:
   ContrailAnalyticsRedisServerIp:
     description: Redis server ip address
     type: string
+    default: '127.0.0.1'
   ContrailAnalyticsCollectorServerHttpPort:
     description: Collector http port
     type: number

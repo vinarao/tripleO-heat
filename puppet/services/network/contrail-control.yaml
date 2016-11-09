@@ -24,12 +24,15 @@ parameters:
   ContrailControlHostIP:
     description: host IP address of Analytics
     type: string
+    default: '127.0.0.1'
   ContrailControlIfmapUserName:
     description: Ifmap user name
     type: string
+    default: 'control'
   ContrailControlIfmapUserPassword:
     description: Ifmap user password
     type: string
+    default: 'control'
   ContrailControlRNDCSecret:
     description: RNDCSecret
     default: sHE1SM8nsySdgsoRxwARtA==

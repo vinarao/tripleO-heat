@@ -24,12 +24,15 @@ parameters:
   ContrailWebUiAnalyticsVip:
     description: Contrail Analytics VIP
     type: string
+    default: '127.0.0.1'
   ContrailWebUiConfigVip:
     description: Contrail Config VIP
     type: string
+    default: '127.0.0.1'
   ContrailWebUiNeutronVip:
     description: Neutron VIP
     type: string
+    default: '127.0.0.1'
   ContrailWebuiHttpPort:
     default: 8080
     description: HTTP Port of Webui

@@ -3,3 +3,5 @@ parameter_defaults:
   ContrailControllerCount: 3
   ContrailControllerImage: overcloud-contrail
   NtpServer: 10.84.5.100
+  ContrailConfigIfmapUserName: api-server
+  ContrailConfigIfmapUserPassword: api-server

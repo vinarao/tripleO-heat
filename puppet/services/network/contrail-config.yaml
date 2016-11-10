@@ -28,11 +28,11 @@ parameters:
   ContrailConfigIfmapUserName:
     description: Ifmap user name
     type: string
-    default: 'api'
+    default: 'api-server'
   ContrailConfigIfmapUserPassword:
     description: Ifmap user password
     type: string
-    default: 'api'
+    default: 'api-server'
   ContrailConfigRedisServerIp:
     description: Redis server ip address
     type: string

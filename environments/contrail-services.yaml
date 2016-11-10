@@ -2,26 +2,26 @@ resource_registry:
   OS::TripleO::Services:Ntp: ../puppet/services/time/ntp.yaml
 parameter_defaults:
   NovaImage: overcloud-full-compute
-  AdminPassword: admin
-  AdminTenantName: admin
-  AdminToken: admin
-  AdminUser: admin
-  AuthHost: 127.0.0.1
-  ContrailDiscoveryServerIp: 127.0.0.1
-  ContrailKafkaBrokerList: 127.0.0.1
-  ContrailAnalyticsHostIP: 127.0.0.1
-  ContrailAnalyticsRedisServerIp: 127.0.0.1
-  ContrailConfigIfmapServerIp: 127.0.0.1
-  ContrailConfigIfmapUserName: api-server
-  ContrailConfigIfmapUserPassword: api-server
-  #ContrailConfigRabbitServerIp: 127.0.0.1
-  ContrailConfigRedisServerIp: 127.0.0.1
-  ContrailControlHostIP: 127.0.0.1
-  #ContrailControlIfmapUserName: control
-  #ContrailControlIfmapUserPassword: control
-  ContrailDatabaseHostIP: 127.0.0.1
-  ContrailWebUiAnalyticsVip: 127.0.0.1
-  ContrailWebUiConfigVip: 127.0.0.1
   ContrailControllerCount: 3
   ContrailControllerImage: overcloud-contrail
   NtpServer: 10.84.5.100
+  #AdminPassword: admin
+  #AdminTenantName: admin
+  #AdminToken: admin
+  #AdminUser: admin
+  #AuthHost: 127.0.0.1
+  #ContrailDiscoveryServerIp: 127.0.0.1
+  #ContrailKafkaBrokerList: 127.0.0.1
+  #ContrailAnalyticsHostIP: 127.0.0.1
+  #ContrailAnalyticsRedisServerIp: 127.0.0.1
+  #ContrailConfigIfmapServerIp: 127.0.0.1
+  #ContrailConfigIfmapUserName: api-server
+  #ContrailConfigIfmapUserPassword: api-server
+  ##ContrailConfigRabbitServerIp: 127.0.0.1
+  #ContrailConfigRedisServerIp: 127.0.0.1
+  #ContrailControlHostIP: 127.0.0.1
+  #ContrailControlIfmapUserName: control
+  #ContrailControlIfmapUserPassword: control
+  #ContrailDatabaseHostIP: 127.0.0.1
+  #ContrailWebUiAnalyticsVip: 127.0.0.1
+  #ContrailWebUiConfigVip: 127.0.0.1

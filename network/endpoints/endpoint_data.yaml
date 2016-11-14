@@ -28,6 +28,15 @@ ContrailConfig:
         net_param: ContrailConfig
     port: 8082
 
+ContrailDiscovery:
+    Internal:
+        net_param: ContrailConfig
+    Public:
+        net_param: Public
+    Admin:
+        net_param: ContrailConfig
+    port: 5998
+
 Gnocchi:
     Internal:
         net_param: GnocchiApi

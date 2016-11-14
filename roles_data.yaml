@@ -138,11 +138,36 @@
 - name: ContrailController
   ServicesDefault:
     - OS::TripleO::Services::CACerts
-    - OS::TripleO::Services::ContrailAnalytics
     - OS::TripleO::Services::ContrailConfig
     - OS::TripleO::Services::ContrailControl
     - OS::TripleO::Services::ContrailDatabase
     - OS::TripleO::Services::ContrailWebUI
+    - OS::TripleO::Services::Kernel
+    - OS::TripleO::Services::Ntp
+    - OS::TripleO::Services::Timezone
+    - OS::TripleO::Services::Snmp
+    - OS::TripleO::Services::TripleoPackages
+    - OS::TripleO::Services::SensuClient
+    - OS::TripleO::Services::FluentdClient
+    - OS::TripleO::Services::VipHosts
+
+- name: ContrailAnalytics
+  ServicesDefault:
+    - OS::TripleO::Services::CACerts
+    - OS::TripleO::Services::ContrailAnalytics
+    - OS::TripleO::Services::Kernel
+    - OS::TripleO::Services::Ntp
+    - OS::TripleO::Services::Timezone
+    - OS::TripleO::Services::Snmp
+    - OS::TripleO::Services::TripleoPackages
+    - OS::TripleO::Services::SensuClient
+    - OS::TripleO::Services::FluentdClient
+    - OS::TripleO::Services::VipHosts
+
+- name: ContrailAnalyticsDatabase
+  ServicesDefault:
+    - OS::TripleO::Services::CACerts
+    - OS::TripleO::Services::ContrailAnalyticsDatabase
     - OS::TripleO::Services::Kernel
     - OS::TripleO::Services::Ntp
     - OS::TripleO::Services::Timezone

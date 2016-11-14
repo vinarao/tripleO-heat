@@ -100,6 +100,7 @@ resource_registry:
   OS::TripleO::Services::CinderScheduler: puppet/services/cinder-scheduler.yaml
   OS::TripleO::Services::CinderVolume: puppet/services/cinder-volume.yaml
   OS::TripleO::Services::ContrailAnalytics: puppet/services/network/contrail-analytics.yaml
+  OS::TripleO::Services::ContrailAnalyticsDatabase: puppet/services/network/contrail-analytics-database.yaml
   OS::TripleO::Services::ContrailConfig: puppet/services/network/contrail-config.yaml
   OS::TripleO::Services::ContrailControl: puppet/services/network/contrail-control.yaml
   OS::TripleO::Services::ContrailDatabase: puppet/services/network/contrail-database.yaml

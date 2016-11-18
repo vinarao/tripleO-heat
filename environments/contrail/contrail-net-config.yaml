@@ -1,0 +1,33 @@
+resource_registry:
+  OS::TripleO::Compute::Net::SoftwareConfig: /home/stack/tripleo-heat-templates/environments/contrail/contrail-nic-config.yaml
+  OS::TripleO::Controller::Net::SoftwareConfig: /home/stack/tripleo-heat-templates/environments/contrail/contrail-nic-config.yaml
+  OS::TripleO::ContrailController::Net::SoftwareConfig: /home/stack/tripleo-heat-templates/environments/contrail/contrail-nic-config.yaml
+  OS::TripleO::ContrailAnalytics::Net::SoftwareConfig: /home/stack/tripleo-heat-templates/environments/contrail/contrail-nic-config.yaml
+  OS::TripleO::ContrailAnalyticsDatabase::Net::SoftwareConfig: /home/stack/tripleo-heat-templates/environments/contrail/contrail-nic-config.yaml
+  OS::TripleO::Network::Management: ../../network/management.yaml
+  OS::TripleO::Network::InternalApi: ../../network/internal_api.yaml
+
+  OS::TripleO::Controller::Ports::ManagementPort: ../../network/ports/management_from_pool.yaml
+  OS::TripleO::ContrailController::Ports::ManagementPort: ../../network/ports/management_from_pool.yaml
+  OS::TripleO::ContrailAnalytics::Ports::ManagementPort: ../../network/ports/management_from_pool.yaml
+  OS::TripleO::ContrailAnalyticsDatabase::Ports::ManagementPort: ../../network/ports/management_from_pool.yaml
+  OS::TripleO::Compute::Ports::ManagementPort: ../../network/ports/management_from_pool.yaml
+
+  OS::TripleO::Controller::Ports::InternalApiPort: ../../network/ports/internal_api_from_pool.yaml
+  OS::TripleO::ContrailController::Ports::InternalApiPort: ../../network/ports/internal_api_from_pool.yaml
+  OS::TripleO::ContrailAnalytics::Ports::InternalApiPort: ../../network/ports/internal_api_from_pool.yaml
+  OS::TripleO::ContrailAnalyticsDatabase::Ports::InternalApiPort: ../../network/ports/internal_api_from_pool.yaml
+  OS::TripleO::Compute::Ports::InternalApiPort: ../../network/ports/internal_api_from_pool.yaml
+
+
+
+parameter_defaults:
+  InternalApiNetCidr: 10.0.0.0/24
+  ManagementNetCidr: 10.1.0.0/24
+  ManagementInterfaceDefaultRoute: 10.1.0.1
+  ManagementAllocationPools: [{'start': '10.1.0.4', 'end': '10.1.0.250'}]
+  InternalApiAllocationPools: [{'start': '10.0.0.4', 'end': '10.0.0.250'}]
+  EC2MetadataIp: 192.0.2.1
+  ControlPlaneDefaultRoute: 192.0.2.1
+  InternalApiNetEnableDHCP: true
+  ManagementNetEnableDHCP: true

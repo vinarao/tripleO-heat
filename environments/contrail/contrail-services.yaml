@@ -1,19 +1,19 @@
 parameter_defaults:
   NovaImage: overcloud-full-compute
-  ContrailControllerCount: 3
+  ContrailAnalyticsImage: overcloud-contrail
   ContrailControllerImage: overcloud-contrail
+  ContrailAnalyticsDatabaseImage: overcloud-contrail
   NtpServer: 10.84.5.100
   ContrailConfigIfmapUserName: api-server
   ContrailConfigIfmapUserPassword: api-server
-  OvercloudContrailControllerFlavor: contrail-controller
-  OvercloudComputeFlavor: compute
-  OvercloudContrailAnalyticsFlavor: contrail-analytics
   OvercloudControlFlavor: control
+  OvercloudContrailControllerFlavor: contrail-controller
+  OvercloudContrailAnalyticsFlavor: contrail-analytics
   OvercloudContrailAnalyticsDatabaseFlavor: contrail-analytics-database
-  ContrailAnalyticsCount: 3
-  ContrailAnalyticsDatabaseCount: 3
-  ContrailAnalyticsImage: overcloud-contrail
-  ContrailAnalyticsDatabaseImage: overcloud-contrail
+  OvercloudComputeFlavor: compute
+  ControlllerCount: 1
+#  ContrailControllerCount: 3
+#  ContrailAnalyticsCount: 3
+#  ContrailAnalyticsDatabaseCount: 3
   ComputeCount: 1
-  ControlCount: 1
   DnsServers: ["8.8.8.8","8.8.4.4"]

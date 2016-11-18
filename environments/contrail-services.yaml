@@ -11,7 +11,7 @@ parameter_defaults:
   OvercloudContrailAnalyticsFlavor: contrail-analytics
   OvercloudContrailAnalyticsDatabaseFlavor: contrail-analytics-database
   OvercloudComputeFlavor: compute
-  ControlllerCount: 1
+  ControllerCount: 1
 #  ContrailControllerCount: 3
 #  ContrailAnalyticsCount: 3
 #  ContrailAnalyticsDatabaseCount: 3

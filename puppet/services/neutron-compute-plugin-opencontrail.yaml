@@ -35,5 +35,6 @@ outputs:
       config_settings:
         map_merge:
           - get_attr: [ContrailBase, role_data, config_settings]
+          - neutron::plugins::opencontrail::host_ip: {get_param: [ServiceNetMap, NeutronCorePluginOpencontrailNetwork]}
       step_config: |
         include ::tripleo::profile::base::neutron::opencontrail::vrouter

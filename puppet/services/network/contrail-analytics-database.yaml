@@ -46,7 +46,7 @@ outputs:
       config_settings:
         map_merge:
           - get_attr: [ContrailBase, role_data, config_settings]
-          - contrail::analytics::database::host_ip: {get_param: ContrailAnalyticsDatabaseHostIP}
+          - contrail::analytics::database::host_ip: {get_param: [ServiceNetMap, ContrailAnalyticsDatabaseNetwork]}
             contrail::analytics::database::minimum_diskGB: {get_param: ContrailAnalyticsDatabaseMinDisk}
       step_config: |
         include ::tripleo::network::contrail::analyticsdatabase

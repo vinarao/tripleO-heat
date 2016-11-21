@@ -80,7 +80,7 @@ outputs:
           - get_attr: [ContrailBase, role_data, config_settings]
           - contrail::analytics::collector_http_server_port: {get_param: ContrailAnalyticsCollectorServerHttpPort}
             contrail::analytics::collector_sandesh_port: {get_param: ContrailAnalyticsCollectorSandeshPort}
-            contrail::analytics::host_ip: {get_param: ContrailAnalyticsHostIP}
+            contrail::analytics::host_ip: {get_param: [ServiceNetMap, ContrailAnalyticsNetwork]}
             contrail::analytics::http_server_port: {get_param: ContrailAnalyticsHttpServerPort}
             contrail::analytics::listen_ip_address: {get_param: ContrailAnalyticsListenAddress}
             contrail::analytics::listen_port: {get_param: ContrailAnalyticsListenPort}

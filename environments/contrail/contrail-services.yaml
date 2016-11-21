@@ -11,9 +11,9 @@ parameter_defaults:
   OvercloudContrailAnalyticsFlavor: contrail-analytics
   OvercloudContrailAnalyticsDatabaseFlavor: contrail-analytics-database
   OvercloudComputeFlavor: compute
-  ControlllerCount: 1
-#  ContrailControllerCount: 3
-#  ContrailAnalyticsCount: 3
-#  ContrailAnalyticsDatabaseCount: 3
-  ComputeCount: 1
+  ControlllerCount: 3
+  ContrailControllerCount: 3
+  ContrailAnalyticsCount: 3
+  ContrailAnalyticsDatabaseCount: 3
+  ComputeCount: 3
   DnsServers: ["8.8.8.8","8.8.4.4"]

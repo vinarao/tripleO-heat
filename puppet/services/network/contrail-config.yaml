@@ -68,5 +68,6 @@ outputs:
             contrail::config::listen_ip_address: {get_param: ContrailConfigListenAddress}
             contrail::config::listen_port: {get_param: ContrailConfigListenPort}
             contrail::config::redis_server: {get_param: ContrailConfigRedisServerIp}
+            contrail::config::host_ip: {get_param: [ServiceNetMap, ContrailConfigNetwork]}
       step_config: |
         include ::tripleo::network::contrail::config

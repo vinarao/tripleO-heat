@@ -1,0 +1,20 @@
+resource_registry:
+  OS::TripleO::Compute::Net::SoftwareConfig: contrail-nic-config.yaml
+  OS::TripleO::Controller::Net::SoftwareConfig: contrail-nic-config.yaml
+  OS::TripleO::Controller::Net::SoftwareConfig: contrail-nic-config.yaml
+  OS::TripleO::ContrailController::Net::SoftwareConfig: contrail-nic-config.yaml
+  OS::TripleO::ContrailAnalytics::Net::SoftwareConfig: contrail-nic-config.yaml
+  OS::TripleO::ContrailAnalyticsDatabase::Net::SoftwareConfig: contrail-nic-config.yaml
+  OS::TripleO::AllNodes::Validation: skip-validation.yaml
+
+
+parameter_defaults:
+  ControlPlaneSubnetCidr: '24'
+  ControlPlaneDefaultRoute: 192.0.2.254
+  EC2MetadataIp: 192.0.2.1  # Generally the IP of the Undercloud
+  InternalApiNetCidr: 10.0.0.0/24
+  InternalApiAllocationPools: [{'start': '10.0.0.10', 'end': '10.0.0.200'}]
+  ManagementNetCidr: 10.1.0.0/24
+  ManagementAllocationPools: [{'start': '10.1.0.10', 'end': '10.1.0.200'}]
+  ManagementInterfaceDefaultRoute: 10.1.0.1
+  DnsServers: ["8.8.8.8","8.8.4.4"]

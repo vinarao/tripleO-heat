@@ -54,7 +54,7 @@ outputs:
       config_settings:
         map_merge:
           - get_attr: [ContrailBase, role_data, config_settings]
-          - contrail::database::host_ip: {get_param: ContrailDatabaseHostIP}
+          - contrail::database::host_ip: {get_param: [ServiceNetMap, ContrailDatabaseNetwork]}
             contrail::database::minimum_diskGB: {get_param: ContrailDatabaseMinDisk}
             zookeeper::params::service_name: {get_param: ContrailZookeeperServiceName}
             zookeeper::params::packages: {get_param: ContrailZookeeperPackageName}

@@ -1,7 +1,6 @@
 resource_registry:
   OS::TripleO::Compute::Net::SoftwareConfig: contrail-nic-config.yaml
   OS::TripleO::Controller::Net::SoftwareConfig: contrail-nic-config.yaml
-  OS::TripleO::Controller::Net::SoftwareConfig: contrail-nic-config.yaml
   OS::TripleO::ContrailController::Net::SoftwareConfig: contrail-nic-config.yaml
   OS::TripleO::ContrailAnalytics::Net::SoftwareConfig: contrail-nic-config.yaml
   OS::TripleO::ContrailAnalyticsDatabase::Net::SoftwareConfig: contrail-nic-config.yaml
@@ -16,5 +15,6 @@ parameter_defaults:
   InternalApiAllocationPools: [{'start': '10.0.0.10', 'end': '10.0.0.200'}]
   ManagementNetCidr: 10.1.0.0/24
   ManagementAllocationPools: [{'start': '10.1.0.10', 'end': '10.1.0.200'}]
+  InternalApiDefaultRoute: 10.0.0.1
   ManagementInterfaceDefaultRoute: 10.1.0.1
   DnsServers: ["8.8.8.8","8.8.4.4"]

@@ -18,6 +18,18 @@ parameters:
     description: Mapping of service endpoint -> protocol. Typically set
                  via parameter_defaults in the resource registry.
     type: json
+  VrouterPhysicalInterface:
+    default: 'eth0'
+    description: vRouter physical interface
+    type: string
+  VrouterGateway:
+    default: '192.0.2.1'
+    description: vRouter default gateway
+    type: string
+  VrouterNetmask:
+    default: '255.255.255.0'
+    description: vRouter netmask
+    type: string
 
 resources:
   ContrailBase:
@@ -36,5 +48,8 @@ outputs:
         map_merge:
           - get_attr: [ContrailBase, role_data, config_settings]
           - neutron::plugins::opencontrail::host_ip: {get_param: [ServiceNetMap, NeutronCorePluginOpencontrailNetwork]}
+            neutron::plugins::opencontrail::physical_interface: {get_param: VrouterPhysicalInterface}
+            neutron::plugins::opencontrail::gateway: {get_param: VrouterGateway}
+            neutron::plugins::opencontrail::netmask: {get_param: VrouterNetmask}
       step_config: |
         include ::tripleo::profile::base::neutron::opencontrail::vrouter

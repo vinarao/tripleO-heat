@@ -123,7 +123,7 @@ resources:
               type: linux_bridge
               name: br0
               use_dhcp: false
-                            members:
+              members:
                 -
                   type: interface
                   name: nic3

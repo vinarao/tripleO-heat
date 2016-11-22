@@ -23,3 +23,4 @@ parameter_defaults:
   VrouterNetmask: 255.255.255.0
   ControlVirtualInterface: eth0
   PublicVirtualInterface: eth1
+  ExternalNetCidr: 10.2.0.0/24

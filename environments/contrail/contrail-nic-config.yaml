@@ -108,9 +108,6 @@ resources:
                 -
                   ip_netmask: 169.254.169.254/32
                   next_hop: {get_param: EC2MetadataIp}
-                #-
-                #  default: true
-                #  next_hop: {get_param: ControlPlaneDefaultRoute}
             -
               type: interface
               name: nic2
@@ -119,9 +116,6 @@ resources:
                 -
                   ip_netmask: {get_param: InternalApiIpSubnet}
               routes:
-                #-
-                #  ip_netmask: 169.254.169.254/32
-                #  next_hop: {get_param: EC2MetadataIp}
                 -
                   default: true
                   next_hop: {get_param: InternalApiDefaultRoute}
@@ -132,10 +126,6 @@ resources:
               addresses:
                 -
                   ip_netmask: {get_param: ManagementIpSubnet}
-              #routes:
-              #  -
-              #    default: true
-              #    next_hop: {get_param: ManagementInterfaceDefaultRoute}
 
 outputs:
   OS::stack_id:

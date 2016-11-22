@@ -35,7 +35,7 @@ parameters:
       ContrailControlNetwork: internal_api
       ContrailDatabaseNetwork: internal_api
       ContrailWebuiNetwork: internal_api
-      NeutronCorePluginOpencontrailnetwork: internal_api
+      NeutronCorePluginOpencontrailNetwork: internal_api
       GlanceApiNetwork: storage
       GlanceRegistryNetwork: internal_api
       IronicApiNetwork: ctlplane

@@ -113,8 +113,8 @@ outputs:
         contrail::admin_tenant_name: {get_param: AdminTenantName}
         contrail::admin_token: {get_param: AdminToken}
         contrail::admin_user: {get_param: AdminUser}
-        contrail::auth_host: {get_param: [EndpointMap, KeystoneInternal, host] }
-        contrail::auth_port: {get_param: [EndpointMap, KeystoneInternal, port] }
+        contrail::auth_host: {get_param: [EndpointMap, KeystonePublic, host] }
+        contrail::auth_port: {get_param: [EndpointMap, KeystoneAdmin, port] }
         contrail::auth_protocol: {get_param: [EndpointMap, KeystoneInternal, protocol] }
         contrail::disc_server_ip: {get_param: ContrailDiscoveryServerIp}
         contrail::kafka_broker_list: {get_param: ContrailKafkaBrokerList}

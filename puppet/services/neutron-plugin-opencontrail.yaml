@@ -76,10 +76,10 @@ outputs:
             neutron::plugins::opencontrail::api_server_port: {get_param: ContrailApiServerPort}
             neutron::plugins::opencontrail::multi_tenancy: {get_param: ContrailMultiTenancy}
             neutron::plugins::opencontrail::contrail_extensions: {get_param: ContrailExtensions}
-            neutron::plugins::opencontrail::keystone_auth_host: {get_param: [EndpointMap, KeystoneInternal, host] }
+            neutron::plugins::opencontrail::keystone_auth_host: {get_param: [EndpointMap, KeystonePublic, host] }
             neutron::plugins::opencontrail::keystone_auth_protocol: {get_param: ContrailAuthProtocol}
             neutron::plugins::opencontrail::keystone_auth_port: {get_param: ContrailAuthPort}
-            neutron::plugins::opencontrail::keystone_auth_url: {get_param: [EndpointMap, KeystoneInternal, uri] }
+            neutron::plugins::opencontrail::keystone_auth_url: {get_param: [EndpointMap, KeystonePublic, uri] }
             neutron::plugins::opencontrail::keystone_admin_user: admin
             neutron::plugins::opencontrail::keystone_admin_tenant_name: admin
             neutron::plugins::opencontrail::keystone_admin_password: {get_param: AdminPassword}

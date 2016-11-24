@@ -51,5 +51,10 @@ outputs:
             neutron::plugins::opencontrail::physical_interface: {get_param: VrouterPhysicalInterface}
             neutron::plugins::opencontrail::gateway: {get_param: VrouterGateway}
             neutron::plugins::opencontrail::netmask: {get_param: VrouterNetmask}
+            neutron::plugins::opencontrail::metadata_proxy_shared_secret: {get_param: NeutronMetadataProxySharedSecret}
+            tripleo.neutron_api.firewall_rules:
+              '1 metadata proxy':
+                dport:
+                  - 8097
       step_config: |
         include ::tripleo::profile::base::neutron::opencontrail::vrouter

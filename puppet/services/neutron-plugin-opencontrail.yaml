@@ -84,5 +84,6 @@ outputs:
             neutron::plugins::opencontrail::keystone_admin_tenant_name: admin
             neutron::plugins::opencontrail::keystone_admin_password: {get_param: AdminPassword}
             neutron::plugins::opencontrail::keystone_admin_token: {get_param: AdminToken}
+            neutron::plugins::opencontrail::keystone_public_vip: {get_param: [EndpointMap, KeystonePublic, host]}
       step_config: |
         include tripleo::profile::base::neutron::plugins::opencontrail

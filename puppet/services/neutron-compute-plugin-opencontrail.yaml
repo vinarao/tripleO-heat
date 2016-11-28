@@ -18,6 +18,10 @@ parameters:
     description: Mapping of service endpoint -> protocol. Typically set
                  via parameter_defaults in the resource registry.
     type: json
+  NeutronMetadataProxySharedSecret:
+    default: 'secret'
+    description: Metadata Secret
+    type: string
   VrouterPhysicalInterface:
     default: 'eth0'
     description: vRouter physical interface
@@ -52,9 +56,9 @@ outputs:
             neutron::plugins::opencontrail::gateway: {get_param: VrouterGateway}
             neutron::plugins::opencontrail::netmask: {get_param: VrouterNetmask}
             neutron::plugins::opencontrail::metadata_proxy_shared_secret: {get_param: NeutronMetadataProxySharedSecret}
-            tripleo.neutron_api.firewall_rules:
-              '1 metadata proxy':
-                dport:
-                  - 8097
+            tripleo.neutron_compute_plugin_opencontrail.firewall_rules:
+              '111 neutron_compute_plugin_opencontrail proxy':
+                dport: 8097
+                proto: tcp
       step_config: |
         include ::tripleo::profile::base::neutron::opencontrail::vrouter

@@ -29,10 +29,10 @@ resource_registry:
   OS::TripleO::Controller::Ports::ManagementPort: ../network/ports/management.yaml
 
   # Port assignments for the compute role
-  OS::TripleO::Compute::Ports::ExternalPort: ../network/ports/external.yaml
+  OS::TripleO::Compute::Ports::ExternalPort: ../network/ports/noop.yaml
   OS::TripleO::Compute::Ports::InternalApiPort: ../network/ports/internal_api.yaml
   OS::TripleO::Compute::Ports::StoragePort: ../network/ports/storage.yaml
-  OS::TripleO::Compute::Ports::StorageMgmtPort: ../network/ports/storage_mgmt.yaml
+  OS::TripleO::Compute::Ports::StorageMgmtPort: ../network/ports/noop.yaml
   OS::TripleO::Compute::Ports::TenantPort: ../network/ports/tenant.yaml
   OS::TripleO::Compute::Ports::ManagementPort: ../network/ports/management.yaml
 

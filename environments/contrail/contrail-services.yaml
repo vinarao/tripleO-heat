@@ -1,8 +1,14 @@
 parameter_defaults:
-  NovaImage: overcloud-full-compute
-  ContrailAnalyticsImage: overcloud-contrail
-  ContrailControllerImage: overcloud-contrail
-  ContrailAnalyticsDatabaseImage: overcloud-contrail
+  DeployArtifactURLs:
+    - 'http://192.0.2.1/contrail/puppet-modules.tgz'
+    - 'http://192.0.2.1/contrail/contrail-repo.tgz'
+
+    
+parameter_defaults:
+  NovaImage: overcloud-full
+  ContrailAnalyticsImage: overcloud-full
+  ContrailControllerImage: overcloud-full
+  ContrailAnalyticsDatabaseImage: overcloud-full
   NtpServer: 10.84.5.100
   ContrailConfigIfmapUserName: api-server
   ContrailConfigIfmapUserPassword: api-server
@@ -11,9 +17,9 @@ parameter_defaults:
   OvercloudContrailAnalyticsFlavor: contrail-analytics
   OvercloudContrailAnalyticsDatabaseFlavor: contrail-analytics-database
   OvercloudComputeFlavor: compute
-  ControllerCount: 3
-  ContrailControllerCount: 3
-  ContrailAnalyticsCount: 3
-  ContrailAnalyticsDatabaseCount: 3
-  ComputeCount: 3
+  ControllerCount: 1
+  ContrailControllerCount: 1
+  ContrailAnalyticsCount: 1
+  ContrailAnalyticsDatabaseCount: 1
+  ComputeCount: 1
   DnsServers: ["8.8.8.8","8.8.4.4"]

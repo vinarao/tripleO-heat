@@ -1,10 +1,5 @@
 parameter_defaults:
-  DeployArtifactURLs:
-    - 'http://192.0.2.1/contrail/puppet-modules.tgz'
-    - 'http://192.0.2.1/contrail/contrail-repo.tgz'
-
-    
-parameter_defaults:
+  EnablePackageInstall: true
   NovaImage: overcloud-full
   ContrailAnalyticsImage: overcloud-full
   ContrailControllerImage: overcloud-full

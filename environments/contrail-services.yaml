@@ -1,4 +1,5 @@
 parameter_defaults:
+  EnablePackageInstall: true
   NovaImage: overcloud-full-compute
   ContrailAnalyticsImage: overcloud-contrail
   ContrailControllerImage: overcloud-contrail

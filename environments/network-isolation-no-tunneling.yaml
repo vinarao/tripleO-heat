@@ -35,8 +35,3 @@ resource_registry:
 
   # Port assignments for service virtual IPs for the controller role
   OS::TripleO::Controller::Ports::RedisVipPort: ../network/ports/vip.yaml
-
-  OS::TripleO::ContrailController::Ports::ExternalPort: ../network/ports/external.yaml
-  OS::TripleO::ContrailController::Ports::InternalApiPort: ../network/ports/internal_api.yaml
-  OS::TripleO::ContrailController::Ports::StoragePort: ../network/ports/storage.yaml
-  OS::TripleO::ContrailController::Ports::StorageMgmtPort: ../network/ports/storage_mgmt.yaml

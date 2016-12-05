@@ -18,6 +18,10 @@ parameters:
     description: Mapping of service endpoint -> protocol. Typically set
                  via parameter_defaults in the resource registry.
     type: json
+  KernelPidMax:
+    default: 1048576
+    description: Configures sysctl kernel.pid_max key
+    type: number
 
 outputs:
   role_data:
@@ -39,11 +43,17 @@ outputs:
           net.netfilter.nf_conntrack_max:
             value: 500000
           # prevent neutron bridges from autoconfiguring ipv6 addresses
+          net.ipv6.conf.all.accept_ra:
+            value: 0
           net.ipv6.conf.default.accept_ra:
+            value: 0
+          net.ipv6.conf.all.autoconf:
             value: 0
           net.ipv6.conf.default.autoconf:
             value: 0
           net.core.netdev_max_backlog:
             value: 10000
+          kernel.pid_max:
+            value: {get_param: KernelPidMax}
       step_config: |
         include ::tripleo::profile::base::kernel

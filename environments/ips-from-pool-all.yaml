@@ -36,14 +36,6 @@ resource_registry:
   OS::TripleO::BlockStorage::Ports::TenantPort: ../network/ports/noop.yaml
   #OS::TripleO::BlockStorage::Ports::ManagementPort: ../network/ports/management_from_pool.yaml
 
-  OS::TripleO::ContrailController::Ports::ExternalPort: ../network/ports/external_from_pool.yaml
-  OS::TripleO::ContrailController::Ports::InternalApiPort: ../network/ports/internal_api_from_pool.yaml
-  OS::TripleO::ContrailController::Ports::StoragePort: ../network/ports/storage_from_pool.yaml
-  OS::TripleO::ContrailController::Ports::StorageMgmtPort: ../network/ports/storage_mgmt_from_pool.yaml
-  OS::TripleO::ContrailController::Ports::TenantPort: ../network/ports/tenant_from_pool.yaml
-  # Management network is optional and disabled by default
-  #OS::TripleO::ContrailController::Ports::ManagementPort: ../network/ports/management_from_pool.yaml
-
 parameter_defaults:
   ControllerIPs:
     # Each controller will get an IP from the lists below, first controller, first IP

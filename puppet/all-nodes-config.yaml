@@ -12,8 +12,6 @@ parameters:
     type: string
   cloud_name_ctlplane:
     type: string
-  hosts:
-    type: comma_delimited_list
   # FIXME(shardy) this can be comma_delimited_list when
   # https://bugs.launchpad.net/heat/+bug/1617019 is fixed
   enabled_services:
@@ -58,12 +56,6 @@ parameters:
       Heat action on performed top-level stack.
     constraints:
     - allowed_values: ['CREATE', 'UPDATE']
-  # NOTE(jaosorior): This is being set as IPA as it's the first
-  # CA we'll actually be testing out. But we can change this if
-  # people request it.
-  CertmongerCA:
-    type: string
-    default: 'IPA'
 
 resources:
 
@@ -72,10 +64,6 @@ resources:
     properties:
       group: os-apply-config
       config:
-        hosts:
-          list_join:
-          - "\n"
-          - {get_param: hosts}
         hiera:
           datafiles:
             bootstrap_node:
@@ -205,17 +193,9 @@ resources:
                     cloud_name_storage: {get_param: cloud_name_storage}
                     cloud_name_storage_mgmt: {get_param: cloud_name_storage_mgmt}
                     cloud_name_ctlplane: {get_param: cloud_name_ctlplane}
-                    # TLS parameters
-                    certmonger_ca: {get_param: CertmongerCA}
 
 outputs:
   config_id:
     description: The ID of the allNodesConfigImpl resource.
     value:
       {get_resource: allNodesConfigImpl}
-  hosts_entries:
-    description: |
-      The content that should be appended to your /etc/hosts if you want to get
-      hostname-based access to the deployed nodes (useful for testing without
-      setting up a DNS).
-    value: {get_attr: [allNodesConfigImpl, config, hosts]}

@@ -72,6 +72,7 @@ parameters:
     constraints:
     - allowed_values: [POLL_SERVER_CFN, POLL_SERVER_HEAT, POLL_TEMP_URL, ZAQAR_MESSAGE]
   CloudDomain:
+    default: 'localdomain'
     type: string
     description: >
       The DNS domain used for the hosts. This should match the dhcp_domain
@@ -253,6 +254,7 @@ resources:
             - extraconfig
             - service_names
             - service_configs
+            - ceph
             - bootstrap_node # provided by allNodesConfig
             - all_nodes # provided by allNodesConfig
             - vip_data # provided by allNodesConfig

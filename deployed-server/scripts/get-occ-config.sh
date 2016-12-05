@@ -5,7 +5,6 @@ set -eux
 SLEEP_TIME=5
 
 CONTROLLER_HOSTS=${CONTROLLER_HOSTS:-""}
-CONTRAIL_CONTROLLER_HOSTS=${CONTRAIL_CONTROLLER_HOSTS:-""}
 COMPUTE_HOSTS=${COMPUTE_HOSTS:-""}
 BLOCKSTORAGE_HOSTS=${BLOCKSTORAGE_HOSTS:-""}
 OBJECTSTORAGE_HOSTS=${OBJECTSTORAGE_HOSTS:-""}
@@ -14,13 +13,12 @@ SUBNODES_SSH_KEY=${SUBNODES_SSH_KEY:-"~/.ssh/id_rsa"}
 SSH_OPTIONS="-tt -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=Verbose -o PasswordAuthentication=no -o ConnectionAttempts=32"
 
 read -a Controller_hosts_a <<< $CONTROLLER_HOSTS
-read -a ContrailController_hosts_a <<< $CONTRAIL_CONTROLLER_HOSTS
 read -a Compute_hosts_a <<< $COMPUTE_HOSTS
 read -a BlockStorage_hosts_a <<< $BLOCKSTORAGE_HOSTS
 read -a ObjectStorage_hosts_a <<< $OBJECTSTORAGE_HOSTS
 read -a CephStorage_hosts_a <<< $CEPHSTORAGE_HOSTS
 
-roles="Controller Compute BlockStorage ObjectStorage CephStorage ContrailController"
+roles="Controller Compute BlockStorage ObjectStorage CephStorage"
 admin_user_id=$(openstack user show admin -c id -f value)
 admin_project_id=$(openstack project show admin -c id -f value)
 

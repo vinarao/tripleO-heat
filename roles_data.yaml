@@ -90,7 +90,8 @@
     - OS::TripleO::Services::NovaIronic
     - OS::TripleO::Services::TripleoPackages
     - OS::TripleO::Services::TripleoFirewall
-    - OS::TripleO::Services::OpenDaylight
+    - OS::TripleO::Services::OpenDaylightApi
+    - OS::TripleO::Services::OpenDaylightOvs
     - OS::TripleO::Services::SensuClient
     - OS::TripleO::Services::FluentdClient
     - OS::TripleO::Services::VipHosts
@@ -135,6 +136,35 @@
     - OS::TripleO::Services::FluentdClient
     - OS::TripleO::Services::VipHosts
 
+- name: ObjectStorage
+  ServicesDefault:
+    - OS::TripleO::Services::CACerts
+    - OS::TripleO::Services::Kernel
+    - OS::TripleO::Services::Ntp
+    - OS::TripleO::Services::SwiftStorage
+    - OS::TripleO::Services::SwiftRingBuilder
+    - OS::TripleO::Services::Snmp
+    - OS::TripleO::Services::Timezone
+    - OS::TripleO::Services::TripleoPackages
+    - OS::TripleO::Services::TripleoFirewall
+    - OS::TripleO::Services::SensuClient
+    - OS::TripleO::Services::FluentdClient
+    - OS::TripleO::Services::VipHosts
+
+- name: CephStorage
+  ServicesDefault:
+    - OS::TripleO::Services::CACerts
+    - OS::TripleO::Services::CephOSD
+    - OS::TripleO::Services::Kernel
+    - OS::TripleO::Services::Ntp
+    - OS::TripleO::Services::Snmp
+    - OS::TripleO::Services::Timezone
+    - OS::TripleO::Services::TripleoPackages
+    - OS::TripleO::Services::TripleoFirewall
+    - OS::TripleO::Services::SensuClient
+    - OS::TripleO::Services::FluentdClient
+    - OS::TripleO::Services::VipHosts
+
 - name: ContrailController
   ServicesDefault:
     - OS::TripleO::Services::CACerts
@@ -173,34 +203,6 @@
     - OS::TripleO::Services::Timezone
     - OS::TripleO::Services::Snmp
     - OS::TripleO::Services::TripleoPackages
-    - OS::TripleO::Services::SensuClient
-    - OS::TripleO::Services::FluentdClient
-    - OS::TripleO::Services::VipHosts
-
-- name: ObjectStorage
-  ServicesDefault:
-    - OS::TripleO::Services::CACerts
-    - OS::TripleO::Services::Kernel
-    - OS::TripleO::Services::Ntp
-    - OS::TripleO::Services::SwiftStorage
-    - OS::TripleO::Services::SwiftRingBuilder
-    - OS::TripleO::Services::Snmp
-    - OS::TripleO::Services::Timezone
-    - OS::TripleO::Services::TripleoPackages
-    - OS::TripleO::Services::TripleoFirewall
-    - OS::TripleO::Services::SensuClient
-    - OS::TripleO::Services::FluentdClient
-    - OS::TripleO::Services::VipHosts
-
-- name: CephStorage
-  ServicesDefault:
-    - OS::TripleO::Services::CACerts
-    - OS::TripleO::Services::CephOSD
-    - OS::TripleO::Services::Kernel
-    - OS::TripleO::Services::Ntp
-    - OS::TripleO::Services::Timezone
-    - OS::TripleO::Services::TripleoPackages
-    - OS::TripleO::Services::TripleoFirewall
     - OS::TripleO::Services::SensuClient
     - OS::TripleO::Services::FluentdClient
     - OS::TripleO::Services::VipHosts

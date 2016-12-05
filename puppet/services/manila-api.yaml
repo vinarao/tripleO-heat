@@ -51,6 +51,11 @@ outputs:
             manila::keystone::authtoken::auth_uri: {get_param: [EndpointMap, KeystoneInternal, uri]}
             manila::keystone::authtoken::auth_url: { get_param: [EndpointMap, KeystoneAdmin, uri_no_suffix] }
             manila::keystone::authtoken::project_name: 'service'
+            tripleo.manila_api.firewall_rules:
+              '150 manila':
+                dport:
+                  - 8786
+                  - 13786
             # NOTE: bind IP is found in Heat replacing the network name with the
             # local node IP for the given network; replacement examples
             # (eg. for internal_api):
@@ -62,21 +67,15 @@ outputs:
       step_config: |
         include ::tripleo::profile::base::manila::api
       service_config_settings:
-        keystone:
-          manila::keystone::auth::tenant: 'service'
-          manila::keystone::auth::public_url: {get_param: [EndpointMap, ManilaV1Public, uri]}
-          manila::keystone::auth::internal_url: {get_param: [EndpointMap, ManilaV1Internal, uri]}
-          manila::keystone::auth::admin_url: {get_param: [EndpointMap, ManilaV1Admin, uri]}
-          manila::keystone::auth::public_url_v2: {get_param: [EndpointMap, ManilaPublic, uri]}
-          manila::keystone::auth::internal_url_v2: {get_param: [EndpointMap, ManilaInternal, uri]}
-          manila::keystone::auth::admin_url_v2: {get_param: [EndpointMap, ManilaAdmin, uri]}
-          manila::keystone::auth::password: {get_param: ManilaPassword}
-          manila::keystone::auth::region: {get_param: KeystoneRegion}
-        mysql:
-          manila::db::mysql::password: {get_param: ManilaPassword}
-          manila::db::mysql::user: manila
-          manila::db::mysql::host: {get_param: [EndpointMap, MysqlInternal, host_nobrackets]}
-          manila::db::mysql::dbname: manila
-          manila::db::mysql::allowed_hosts:
-            - '%'
-            - "%{hiera('mysql_bind_host')}"
+        map_merge:
+          - get_attr: [ManilaBase, role_data, service_config_settings]
+          - keystone:
+              manila::keystone::auth::tenant: 'service'
+              manila::keystone::auth::public_url: {get_param: [EndpointMap, ManilaV1Public, uri]}
+              manila::keystone::auth::internal_url: {get_param: [EndpointMap, ManilaV1Internal, uri]}
+              manila::keystone::auth::admin_url: {get_param: [EndpointMap, ManilaV1Admin, uri]}
+              manila::keystone::auth::public_url_v2: {get_param: [EndpointMap, ManilaPublic, uri]}
+              manila::keystone::auth::internal_url_v2: {get_param: [EndpointMap, ManilaInternal, uri]}
+              manila::keystone::auth::admin_url_v2: {get_param: [EndpointMap, ManilaAdmin, uri]}
+              manila::keystone::auth::password: {get_param: ManilaPassword}
+              manila::keystone::auth::region: {get_param: KeystoneRegion}

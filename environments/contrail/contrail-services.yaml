@@ -18,5 +18,5 @@ parameter_defaults:
   ContrailAnalyticsDatabaseCount: 3
   ComputeCount: 3
   DnsServers: ["8.8.8.8","8.8.4.4"]
-  LibvirtCpuMode: custom
-  LibvirtCpuModel: Nehalem
+  NovaLibvirtCpuMode: custom
+  NovaLibvirtCpuModel: Nehalem

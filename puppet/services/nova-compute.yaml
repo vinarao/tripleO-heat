@@ -40,6 +40,14 @@ parameters:
     default: ''
     description: Libvirt VIF driver configuration for the network
     type: string
+  NovaLibvirtCpuModel:
+    default: ''
+    description: Custom CPU model
+    type: string
+  NovaLibvirtCpuMode:
+    default: ''
+    description: Custom CPU mode
+    type: string
   NovaPCIPassthrough:
     description: >
       List of PCI Passthrough whitelist parameters.
@@ -106,6 +114,8 @@ outputs:
             nova::compute::reserved_host_memory: {get_param: NovaReservedHostMemory}
             # we manage migration in nova common puppet profile
             nova::compute::libvirt::migration_support: false
+            nova::compute::libvirt::cpu_model: {get_param: NovaLibvirtCpuModel}
+            nova::compute::libvirt::cpu_mode: {get_param: NovaLibvirtCpuMode}
             tripleo::profile::base::nova::manage_migration: true
             tripleo::profile::base::nova::nova_compute_enabled: true
             nova::compute::rbd::libvirt_images_rbd_pool: {get_param: NovaRbdPoolName}

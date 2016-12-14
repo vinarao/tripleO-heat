@@ -1,0 +1,6 @@
+[Contrail]
+name=Contrail Repo
+baseurl=http://192.0.2.1/contrail-3.2.0.0-8
+enabled=1
+gpgcheck=0
+protect=1

@@ -4,7 +4,7 @@ parameter_defaults:
   ContrailAnalyticsImage: overcloud-full
   ContrailControllerImage: overcloud-full
   ContrailAnalyticsDatabaseImage: overcloud-full
-  NtpServer: 10.84.5.100
+  NtpServer: 10.0.0.1
   ContrailConfigIfmapUserName: api-server
   ContrailConfigIfmapUserPassword: api-server
   OvercloudControlFlavor: control
@@ -18,3 +18,5 @@ parameter_defaults:
   ContrailAnalyticsDatabaseCount: 3
   ComputeCount: 3
   DnsServers: ["8.8.8.8","8.8.4.4"]
+  LibvirtCpuMode: custom
+  LibvirtCpuModel: Nehalem

@@ -118,6 +118,7 @@ resource_registry:
   OS::TripleO::Services::ContrailConfig: puppet/services/network/contrail-config.yaml
   OS::TripleO::Services::ContrailControl: puppet/services/network/contrail-control.yaml
   OS::TripleO::Services::ContrailDatabase: puppet/services/network/contrail-database.yaml
+  OS::TripleO::Services::ContrailHeat: puppet/services/network/contrail-heat.yaml
   OS::TripleO::Services::ContrailWebUI: puppet/services/network/contrail-webui.yaml
   OS::TripleO::Services::BlockStorageCinderVolume: puppet/services/cinder-volume.yaml
   OS::TripleO::Services::Core: OS::Heat::None
@@ -141,11 +142,12 @@ resource_registry:
   # can be the same as NeutronCorePlugin but some vendors install different
   # things where VMs run
   OS::TripleO::Services::ComputeNeutronCorePlugin: puppet/services/neutron-plugin-ml2.yaml
+  OS::TripleO::Services::ComputeNeutronCorePluginContrail: puppet/services/contrail-vrouter.yaml
   # Neutron Core Plugin Vendors (these typically override NeutronCorePlugin)
   OS::TripleO::Services::NeutronCorePluginML2OVN: puppet/services/neutron-plugin-ml2-ovn.yaml
   OS::TripleO::Services::NeutronCorePluginPlumgrid: puppet/services/neutron-plugin-plumgrid.yaml
   OS::TripleO::Services::NeutronCorePluginNuage: puppet/services/neutron-plugin-nuage.yaml
-  OS::TripleO::Services::NeutronCorePluginOpencontrail: puppet/services/neutron-plugin-opencontrail.yaml
+  OS::TripleO::Services::NeutronCorePluginContrail: puppet/services/contrail-neutron-plugin.yaml
   OS::TripleO::Services::NeutronCorePluginMidonet: puppet/services/neutron-midonet.yaml
   OS::TripleO::Services::NeutronOvsAgent: puppet/services/neutron-ovs-agent.yaml
   OS::TripleO::Services::ComputeNeutronOvsAgent: puppet/services/neutron-ovs-agent.yaml

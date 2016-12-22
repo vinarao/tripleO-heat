@@ -37,6 +37,69 @@ ContrailDiscovery:
         net_param: ContrailConfig
     port: 5998
 
+ContrailAnalyticsCollectorHttp:
+    Internal:
+        net_param: ContrailAnalytics
+    Public:
+        net_param: Public
+    Admin:
+        net_param: ContrailAnalytics
+    port: 8089
+
+ContrailAnalyticsApi:
+    Internal:
+        net_param: ContrailAnalytics
+    Public:
+        net_param: Public
+    Admin:
+        net_param: ContrailAnalytics
+    port: 8081
+
+ContrailAnalyticsHttp:
+    Internal:
+        net_param: ContrailAnalytics
+    Public:
+        net_param: Public
+    Admin:
+        net_param: ContrailAnalytics
+    port: 8090
+
+ContrailAnalyticsCollectorSandesh:
+    Internal:
+        net_param: ContrailAnalytics
+    Public:
+        net_param: Public
+    Admin:
+        net_param: ContrailAnalytics
+    port: 8086
+
+ContrailAnalyticsRedis:
+    Internal:
+        net_param: ContrailAnalytics
+    Public:
+        net_param: Public
+    Admin:
+        net_param: ContrailAnalytics
+    port: 6379
+
+ContrailWebuiHttp:
+    Internal:
+        net_param: ContrailConfig
+    Public:
+        net_param: Public
+    Admin:
+        net_param: ContrailConfig
+    port: 8080
+
+ContrailWebuiHttps:
+    Internal:
+        net_param: ContrailConfig
+    Public:
+        net_param: Public
+    Admin:
+        net_param: ContrailConfig
+    port: 8143
+
 Gnocchi:
     Internal:
         net_param: GnocchiApi

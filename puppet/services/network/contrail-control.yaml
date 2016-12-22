@@ -21,18 +21,10 @@ parameters:
     description: Mapping of service endpoint -> protocol. Typically set
                  via parameter_defaults in the resource registry.
     type: json
-  ContrailControlHostIP:
-    description: host IP address of Analytics
-    type: string
-    default: '127.0.0.1'
-  ContrailControlIfmapUserName:
-    description: Ifmap user name
-    type: string
-    default: 'control'
-  ContrailControlIfmapUserPassword:
-    description: Ifmap user password
-    type: string
-    default: 'control'
+  ContrailControlASN:
+    description: Autonomous System Number
+    type: number
+    default: 64512
   ContrailControlRNDCSecret:
     description: RNDCSecret
     default: sHE1SM8nsySdgsoRxwARtA==
@@ -54,9 +46,8 @@ outputs:
       config_settings:
         map_merge:
           - get_attr: [ContrailBase, role_data, config_settings]
-          - contrail::control::host_ip: {get_param: [ServiceNetMap, ContrailControlNetwork]}
-            contrail::control::ifmap_username: {get_param: ContrailControlIfmapUserName}
-            contrail::control::ifmap_password: {get_param: ContrailControlIfmapUserPassword}
+          - contrail::control::asn: {get_param: ContrailControlASN }
+            contrail::control::host_ip: {get_param: [ServiceNetMap, ContrailControlNetwork]}
             contrail::control::rndc_secret: {get_param: ContrailControlRNDCSecret}
       step_config: |
         include ::tripleo::network::contrail::control

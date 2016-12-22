@@ -46,26 +46,10 @@ parameters:
     default: 'http'
     description: Keystone authentication protocol
     type: string
-  ContrailDiscoveryServerIp:
-    description: Discovery server ip address
-    type: string
-    default: '127.0.0.1'
-  ContrailKafkaBrokerList:
-    description: List of kafka servers
-    type: comma_delimited_list
-    default: []
   ContrailAuth:
     default: 'keystone'
     description: Keystone authentication method
     type: string
-  ContrailCassandraServerList:
-    default: []
-    description: List of cassandra servers
-    type: comma_delimited_list
-  ContrailDiscoveryServerPort:
-    description: Discovery server port
-    type: number
-    default: 5998
   ContrailInsecure:
     default: false
     description: Keystone insecure mode
@@ -78,30 +62,18 @@ parameters:
     default: true
     description: Turn on/off multi-tenancy
     type: boolean
-  ContrailZkServerIp:
-    default: []
-    description: List of zookeeper servers
-    type: comma_delimited_list
-  ContrailZkHostnames:
-    default: []
-    description: List of zookeeper server hostnames
-    type: comma_delimited_list
+  RabbitPassword:
+    description: The password for RabbitMQ
+    type: string
+    hidden: true
+  RabbitUserName:
+    default: guest
+    description: The username for RabbitMQ
+    type: string
   RabbitClientPort:
     default: 5672
-    description: RabbitMQClientPort
+    description: Set rabbit subscriber port, change this if using SSL
     type: number
-  RabbitServer:
-    default: '127.0.0.1'
-    description: RabbitMQ server ip
-    type: string
-  RabbitUserName:
-    default: 'guest'
-    description: RabbitMQ username
-    type: string
-  RabbitPassword:
-    default: 'guest'
-    description: RabbitMQ password
-    type: string
 
 outputs:
   role_data:
@@ -113,20 +85,15 @@ outputs:
         contrail::admin_tenant_name: {get_param: AdminTenantName}
         contrail::admin_token: {get_param: AdminToken}
         contrail::admin_user: {get_param: AdminUser}
+        contrail::auth: {get_param: ContrailAuth}
         contrail::auth_host: {get_param: [EndpointMap, KeystonePublic, host] }
         contrail::auth_port: {get_param: [EndpointMap, KeystoneAdmin, port] }
         contrail::auth_protocol: {get_param: [EndpointMap, KeystoneInternal, protocol] }
-        contrail::disc_server_ip: {get_param: ContrailDiscoveryServerIp}
-        contrail::kafka_broker_list: {get_param: ContrailKafkaBrokerList}
-        contrail::auth: {get_param: ContrailAuth}
-        contrail::cassandra_server_list: {get_param: ContrailCassandraServerList}
-        contrail::disc_server_port: {get_param: ContrailDiscoveryServerPort}
+        contrail::api_port: {get_param: [EndpointMap, ContrailConfigInternal, port] }
+        contrail::disc_server_port: {get_param: [EndpointMap, ContrailDiscoveryInternal, port] }
         contrail::insecure: {get_param: ContrailInsecure}
         contrail::memcached_server: {get_param: ContrailMemcachedServer}
         contrail::multi_tenancy: {get_param: ContrailMultiTenancy}
         contrail::rabbit_password: {get_param: RabbitPassword}
-        contrail::rabbit_server: {get_param: [EndpointMap, KeystoneInternal, host] }
         contrail::rabbit_user: {get_param: RabbitUserName}
         contrail::rabbit_port: {get_param: RabbitClientPort}
-        contrail::zk_server_ip: {get_param: ContrailZkServerIp}
-        contrail::zk_hostnames: {get_param: ContrailZkHostnames}

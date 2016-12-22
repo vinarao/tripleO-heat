@@ -21,14 +21,6 @@ parameters:
     description: Mapping of service endpoint -> protocol. Typically set
                  via parameter_defaults in the resource registry.
     type: json
-  ContrailAnalyticsDatabaseHostIP:
-    description: host IP address of Database node
-    type: string
-    default: '127.0.0.1'
-  ContrailAnalyticsDatabaseMinDisk:
-    description: Minimum disk size for database
-    type: number
-    default: 64
 
 resources:
   ContrailBase:
@@ -47,6 +39,5 @@ outputs:
         map_merge:
           - get_attr: [ContrailBase, role_data, config_settings]
           - contrail::analytics::database::host_ip: {get_param: [ServiceNetMap, ContrailAnalyticsDatabaseNetwork]}
-            contrail::analytics::database::minimum_diskGB: {get_param: ContrailAnalyticsDatabaseMinDisk}
       step_config: |
         include ::tripleo::network::contrail::analyticsdatabase

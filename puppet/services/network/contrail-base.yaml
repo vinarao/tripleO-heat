@@ -42,9 +42,21 @@ parameters:
     default: 35357
     description: Keystone port
     type: number
+  AuthPortSSL:
+    default: 13357
+    description: Keystone SSL port
+    type: number
   AuthProtocol:
     default: 'http'
     description: Keystone authentication protocol
+    type: string
+  CaFile:
+    default: '/etc/contrail/ssl/certs/overcloud_ca.pem'
+    description: Full path to CA
+    type: string
+  CertFile:
+    default: '/etc/contrail/ssl/certs/overcloud.pem'
+    description: Full path to cert
     type: string
   ContrailAuth:
     default: 'keystone'
@@ -62,6 +74,10 @@ parameters:
     default: true
     description: Turn on/off multi-tenancy
     type: boolean
+  KeyFile:
+    default: '/etc/contrail/ssl/private/overcloud.key'
+    description: Full path to private key
+    type: string
   RabbitPassword:
     description: The password for RabbitMQ
     type: string
@@ -88,10 +104,14 @@ outputs:
         contrail::auth: {get_param: ContrailAuth}
         contrail::auth_host: {get_param: [EndpointMap, KeystonePublic, host] }
         contrail::auth_port: {get_param: [EndpointMap, KeystoneAdmin, port] }
+        contrail::auth_port_ssl: {get_param: AuthPortSSL }
         contrail::auth_protocol: {get_param: [EndpointMap, KeystoneInternal, protocol] }
         contrail::api_port: {get_param: [EndpointMap, ContrailConfigInternal, port] }
+        contrail::ca_file: {get_param: CaFile }
+        contrail::cert_file: {get_param: CertFile }
         contrail::disc_server_port: {get_param: [EndpointMap, ContrailDiscoveryInternal, port] }
         contrail::insecure: {get_param: ContrailInsecure}
+        contrail::key_file: {get_param: KeyFile }
         contrail::memcached_server: {get_param: ContrailMemcachedServer}
         contrail::multi_tenancy: {get_param: ContrailMultiTenancy}
         contrail::rabbit_password: {get_param: RabbitPassword}

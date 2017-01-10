@@ -23,11 +23,11 @@ parameter_defaults:
   OvercloudContrailAnalyticsFlavor: contrail-analytics
   OvercloudContrailAnalyticsDatabaseFlavor: contrail-analytics-database
   OvercloudComputeFlavor: compute
-  ControllerCount: 3
-  ContrailControllerCount: 3
-  ContrailAnalyticsCount: 3
-  ContrailAnalyticsDatabaseCount: 3
-  ComputeCount: 3
+  ControllerCount: 1
+  ContrailControllerCount: 1
+  ContrailAnalyticsCount: 1
+  ContrailAnalyticsDatabaseCount: 1
+  ComputeCount: 1
   DnsServers: ["8.8.8.8","8.8.4.4"]
   NtpServer: 10.0.0.1
   NovaLibvirtCpuMode: custom
@@ -35,3 +35,5 @@ parameter_defaults:
   NeutronCorePlugin: neutron_plugin_contrail.plugins.opencontrail.contrail_plugin.NeutronPluginContrailCoreV2
   NeutronServicePlugins: ''
   NeutronTunnelTypes: ''
+#enable ssl
+  AuthProtocol: https

@@ -40,6 +40,8 @@ resource_registry:
   #OS::TripleO::BlockStorage::Ports::ManagementPort: ../network/ports/management_from_pool.yaml
 
 parameter_defaults:
+  PublicVirtualFixedIPs:
+    - ip_address: 10.2.0.10
   InternalApiVirtualFixedIPs:
     - ip_address: 10.0.0.10
   ControllerIPs:

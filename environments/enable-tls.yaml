@@ -3,10 +3,40 @@
 # must also be used.
 parameter_defaults:
   SSLCertificate: |
-    The contents of your certificate go here
+    -----BEGIN CERTIFICATE-----
+    MIICdzCCAeACAQIwDQYJKoZIhvcNAQEFBQAwgYMxCzAJBgNVBAYTAlVTMRMwEQYD
+    VQQIEwpDYWxpZm9ybmlhMRIwEAYDVQQHEwlTdW5ueXZhbGUxFTATBgNVBAoTDE9w
+    ZW5Db250cmFpbDESMBAGA1UEAxMJMTAuMi4wLjEwMSAwHgYJKoZIhvcNAQkBFhFh
+    ZG1pbkBqdW5pcGVyLmNvbTAeFw0xNzAxMDkwOTM3MjhaFw0yNzAxMDcwOTM3Mjha
+    MIGDMQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTESMBAGA1UEBxMJ
+    U3Vubnl2YWxlMRUwEwYDVQQKEwxPcGVuQ29udHJhaWwxEjAQBgNVBAMTCTEwLjIu
+    MC4xMDEgMB4GCSqGSIb3DQEJARYRYWRtaW5AanVuaXBlci5jb20wgZ8wDQYJKoZI
+    hvcNAQEBBQADgY0AMIGJAoGBANSJb9Srlferg6C2MFwHOrd9mmsXIt20psfuzbZF
+    m4+4oiDoJ4GeKr8nIVocI4G2UD0xoxGkrL2YqNTVhAb9v3NlO3ZSXIvb29uTFuLM
+    LPYgg/lzycgIfr27a8H1Sh0PINhQbJO7U4et4ECKlb/UYqPmoRBkhyYDhip9yjVG
+    JapzAgMBAAEwDQYJKoZIhvcNAQEFBQADgYEAdkfvfNIMLElKIXpszPZrMEEZMnrf
+    vyjhdrqFdbqZL69oHI/kFieFwejW4NUZ2ac3gZiR0/mCf6V9cIXTL8wqJEt9fi/u
+    6HH8wyOLMrBU/Ctn7/QqAJg3qd8Fci3B5BQ+3qUymAq8FJPjuKJ7jfuvPdaD0DWV
+    /L6LJaZOYVHVEX0=
+    -----END CERTIFICATE-----
   SSLIntermediateCertificate: ''
   SSLKey: |
-    The contents of the private key go here
+    -----BEGIN PRIVATE KEY-----
+    MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBANSJb9Srlferg6C2
+    MFwHOrd9mmsXIt20psfuzbZFm4+4oiDoJ4GeKr8nIVocI4G2UD0xoxGkrL2YqNTV
+    hAb9v3NlO3ZSXIvb29uTFuLMLPYgg/lzycgIfr27a8H1Sh0PINhQbJO7U4et4ECK
+    lb/UYqPmoRBkhyYDhip9yjVGJapzAgMBAAECgYBN5M0CoZxF+Cs2tG8G23Numm8E
+    vqb9oF7bua7VFa/MvbtV2h/YhnJeOmYj01pECOBhfRapubPBjPibgGFx+n+2jHoB
+    hjluxwTv2gT53S7OUcFRL3SkTJP2IaY4c6+Td9JevxvcuRn8MlIl4oU+7Nm/rz3u
+    v8QfTPvExhdepZqWWQJBAP+lDPugzT6QwX3U5+2VFYfhN6V8LVBGRBJYPhcepuAC
+    Vhf/F49cCvVuGtWk9YAGR6NUnhEFWFjP3BOtffCLGv0CQQDU1QzFBnK2XVQud15G
+    8NuHEHEHkleHHYjJ46BpXa58u+9w20Q/l3bKj6sb1W/D+ivMzfRvNYsFEmVfspLZ
+    /24vAkBbbR29h/6fF4n7hH8FmsG+fK84Abb69IY3wVNDVXT8vBkqL9KvNI2+xIfY
+    TEx4YsaQBR0anTzBVmUwrGVT94vJAkBdvHejTvO23eP1kx0yoWIOWm9tpkZme9uD
+    D33W6iuvRBZw3iFw4ISxMhVqbNaMueIQkaTWVf6kfTWosD19RcKBAkEA1wwIR2Mp
+    7NsaivYD4EyZ3GRtHAJZWn2FJBwDGdeFyV7LlLQiCDS0PPmIeyRRhiTb4VRvJoRA
+    spMbmaEvyGeZoA==
+    -----END PRIVATE KEY-----
 
 resource_registry:
   OS::TripleO::NodeTLSData: ../puppet/extraconfig/tls/tls-cert-inject.yaml

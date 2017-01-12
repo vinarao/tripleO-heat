@@ -46,6 +46,14 @@ parameters:
     default: 13357
     description: Keystone SSL port
     type: number
+  AuthPortPublic:
+    default: 5000
+    description: Keystone Public port
+    type: number
+  AuthPortSSLPublic:
+    default: 13000
+    description: Keystone Public SSL port
+    type: number
   AuthProtocol:
     default: 'http'
     description: Keystone authentication protocol
@@ -105,7 +113,9 @@ outputs:
         contrail::auth_host: {get_param: [EndpointMap, KeystonePublic, host] }
         contrail::auth_port: {get_param: [EndpointMap, KeystoneAdmin, port] }
         contrail::auth_port_ssl: {get_param: AuthPortSSL }
-        contrail::auth_protocol: {get_param: [EndpointMap, KeystoneInternal, protocol] }
+        contrail::auth_port_public: {get_param: AuthPortPublic }
+        contrail::auth_port_ssl_public: {get_param: AuthPortSSLPublic }
+        contrail::auth_protocol: {get_param: AuthProtocol }
         contrail::api_port: {get_param: [EndpointMap, ContrailConfigInternal, port] }
         contrail::ca_file: {get_param: CaFile }
         contrail::cert_file: {get_param: CertFile }

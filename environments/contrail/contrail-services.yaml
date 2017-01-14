@@ -11,6 +11,7 @@ resource_registry:
   OS::TripleO::Services::ComputeNeutronCorePlugin: OS::TripleO::Services::ComputeNeutronCorePluginContrail
   OS::TripleO::NodeUserData: ../../firstboot/install_vrouter_kmod.yaml
 parameter_defaults:
+  ContrailRepo: http://192.0.2.1/contrail-3.2.0.0-19
   EnablePackageInstall: true
 #  NovaImage: overcloud-full
 #  ContrailAnalyticsImage: overcloud-full
@@ -36,4 +37,8 @@ parameter_defaults:
   NeutronServicePlugins: ''
   NeutronTunnelTypes: ''
 #enable ssl
-  AuthProtocol: https
+#  AuthProtocol: https
+#  SSLCertRootDir: /etc/contrail/ssl
+#  CaFile: overcloud_ca.pem
+#  CertFile: overcloud.pem
+#  KeyFile: overcloud.key

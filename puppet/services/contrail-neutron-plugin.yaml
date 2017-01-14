@@ -52,9 +52,14 @@ parameters:
     default: ''
 
 resources:
-
   NeutronBase:
     type: ./neutron-base.yaml
+    properties:
+      ServiceNetMap: {get_param: ServiceNetMap}
+      DefaultPasswords: {get_param: DefaultPasswords}
+      EndpointMap: {get_param: EndpointMap}
+  ContrailBase:
+    type: ./network/contrail-base.yaml
     properties:
       ServiceNetMap: {get_param: ServiceNetMap}
       DefaultPasswords: {get_param: DefaultPasswords}

@@ -5,12 +5,9 @@ heat_template_version: 2014-10-16
 # in the resource_registry instead, if you want to override the default
 # and/or share values with other templates in the tree.
 parameters:
-  contrail_repo:
+  ContrailRepo:
     type: string
     default: http://192.0.2.1/contrail-3.2.0.0-19
-  vrouter_url:
-    type: string
-    default: http://192.0.2.1/contrail-3.2.0.0-19/vrouter.ko
   VrouterPhysicalInterface:
     default: 'eth0'
     description: vRouter physical interface
@@ -36,8 +33,7 @@ resources:
           template: |
             #!/bin/bash
             echo c0ntrail123 | passwd root --stdin
-            if [ `hostname |awk -F"-" '{print $2}'` == "novacompute" ]; then 
-              cat <<EOF > /etc/yum.repos.d/contrail.repo
+            cat <<EOF > /etc/yum.repos.d/contrail.repo
             [Contrail]
             name=Contrail Repo
             baseurl=$contrail_repo
@@ -45,6 +41,7 @@ resources:
             gpgcheck=0
             protect=1
             EOF
+            if [ `hostname |awk -F"-" '{print $2}'` == "novacompute" ]; then 
               yum install -y contrail-vrouter-utils
               function pkt_setup () {
                   for f in /sys/class/net/$1/queues/rx-*
@@ -82,14 +79,16 @@ resources:
                   ip link set vhost0 up
                   return 0
               }
-              curl -o /tmp/vrouter.ko $vrouter_url
+              yumdownloader contrail-vrouter --destdir /tmp
+              cd /tmp
+              rpm2cpio /tmp/contrail-vrouter*.rpm | cpio -idmv
+              cp `find /tmp/lib/modules -name vrouter.ko |tail -1` /tmp
               insert_vrouter
               echo "I was here" > /tmp/bla
             fi
           params:
-            $vrouter_url: {get_param: vrouter_url}
             $phy_int: {get_param: VrouterPhysicalInterface}
-            $contrail_repo: {get_param: contrail_repo}
+            $contrail_repo: {get_param: ContrailRepo}
 
 outputs:
   # This means get_resource from the parent template will get the userdata, see:

@@ -33,6 +33,7 @@ resources:
           template: |
             #!/bin/bash
             echo c0ntrail123 | passwd root --stdin
+            sed '/\[main\]/a \ \ \ \ \parser = future' /etc/puppet/puppet.conf
             cat <<EOF > /etc/yum.repos.d/contrail.repo
             [Contrail]
             name=Contrail Repo
@@ -84,7 +85,6 @@ resources:
               rpm2cpio /tmp/contrail-vrouter*.rpm | cpio -idmv
               cp `find /tmp/lib/modules -name vrouter.ko |tail -1` /tmp
               insert_vrouter
-              echo "I was here" > /tmp/bla
             fi
           params:
             $phy_int: {get_param: VrouterPhysicalInterface}

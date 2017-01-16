@@ -40,3 +40,9 @@ parameter_defaults:
 
 resource_registry:
   OS::TripleO::NodeTLSData: ../puppet/extraconfig/tls/tls-cert-inject.yaml
+#  OS::TripleO::NodeTLSDataContrail: ../puppet/extraconfig/tls/tls-cert-inject-contrail.yaml
+#  OS::TripleO::ComputeExtraConfigPre: ../puppet/extraconfig/tls/tls-cert-inject-vrouter.yaml
+  OS::TripleO::ComputeExtraConfigPre: ../puppet/extraconfig/pre_deploy/contrail/contrail-tls.yaml
+  OS::TripleO::ContrailControllerExtraConfigPre: ../puppet/extraconfig/pre_deploy/contrail/contrail-tls.yaml
+  OS::TripleO::ContrailAnalyticsExtraConfigPre: ../puppet/extraconfig/pre_deploy/contrail/contrail-tls.yaml
+  OS::TripleO::ContrailAnalyticsDatabaseExtraConfigPre: ../puppet/extraconfig/pre_deploy/contrail/contrail-tls.yaml

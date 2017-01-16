@@ -8,3 +8,6 @@ name:
   - puppet/blockstorage-role.yaml
   - puppet/objectstorage-role.yaml
   - puppet/cephstorage-role.yaml
+  #- puppet/contrailanalytics-role.yaml
+  #- puppet/contrailanalyticsdatabase-role.yaml
+  #- puppet/contrailcontroller-role.yaml

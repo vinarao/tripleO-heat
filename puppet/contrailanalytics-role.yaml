@@ -256,9 +256,9 @@ resources:
       server: {get_resource: ContrailAnalytics}
 
   # Resource for site-specific passing of private keys/certificates
-  NodeTLSData:
+  NodeTLSDataContrail:
     depends_on: NodeTLSCAData
-    type: OS::TripleO::NodeTLSData
+    type: OS::TripleO::NodeTLSDataContrail
     properties:
       server: {get_resource: ContrailAnalytics}
       NodeIndex: {get_param: NodeIndex}
@@ -310,10 +310,10 @@ resources:
                   - {get_param: ContrailAnalyticsExtraConfig}
             extraconfig:
               mapped_data: {get_param: ExtraConfig}
-            contrailanalytics:
+            contrail_analytics:
               mapped_data: # data supplied directly to this deployment configuration, etc
                 bootstack_nodeid: {get_input: bootstack_nodeid}
-                contrail::analytics::service_certificate: {get_attr: [NodeTLSData, deployed_ssl_certificate_path]}
+                contrail::analytics::service_certificate: {get_attr: [NodeTLSDataContrail, deployed_ssl_certificate_path]}
 
   # Hook for site-specific additional pre-deployment config, e.g extra hieradata
   ContrailAnalyticsExtraConfigPre:
@@ -325,7 +325,7 @@ resources:
   # Hook for site-specific additional pre-deployment config,
   # applying to all nodes, e.g node registration/unregistration
   NodeExtraConfig:
-    depends_on: [ContrailAnalyticsExtraConfigPre, NodeTLSData]
+    depends_on: [ContrailAnalyticsExtraConfigPre, NodeTLSDataContrail]
     type: OS::TripleO::NodeExtraConfig
     properties:
         server: {get_resource: ContrailAnalytics}
@@ -479,7 +479,7 @@ outputs:
       {get_resource: ContrailAnalytics}
   tls_key_modulus_md5:
     description: MD5 checksum of the TLS Key Modulus
-    value: {get_attr: [NodeTLSData, key_modulus_md5]}
+    value: {get_attr: [NodeTLSDataContrail, key_modulus_md5]}
   tls_cert_modulus_md5:
     description: MD5 checksum of the TLS Certificate Modulus
-    value: {get_attr: [NodeTLSData, cert_modulus_md5]}
+    value: {get_attr: [NodeTLSDataContrail, cert_modulus_md5]}

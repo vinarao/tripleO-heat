@@ -63,8 +63,21 @@ resources:
           | openssl md5 | cut -c 10- \
           > ${heat_outputs_path}.key_modulus
 
+  ContrailVrouterConfig:
+    type: OS::Heat::StructuredConfig
+    properties:
+      group: os-apply-config
+      config:
+        hiera:
+          merge_behavior: deeper
+          datafiles:
+            contrail_vrouter:
+              mapped_data: # data supplied directly to this deployment configuration, etc
+                contrail::vrouter::service_certificate: {get_param: DeployedSSLCertificatePath}
+
   ContrailTLSDeployment:
     type: OS::Heat::SoftwareDeployment
+    depends_on: ContrailVrouterConfig
     properties:
       name: ContrailTLSDeployment
       config: {get_resource: ContrailTLSConfig}
@@ -77,6 +90,7 @@ resources:
             - - {get_param: SSLCertificate}
               - {get_param: SSLIntermediateCertificate}
               - {get_param: SSLKey}
+
 
 outputs:
   deploy_stdout:

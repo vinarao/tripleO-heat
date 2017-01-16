@@ -55,6 +55,8 @@ resources:
         ${cert_chain_content}
         EOF
         chmod 0440 ${cert_path}
+        useradd contrail
+        chown contrail ${cert_path}
         md5sum ${cert_path} > ${heat_outputs_path}.chain_md5sum
         openssl x509 -noout -modulus -in ${cert_path} \
           | openssl md5 | cut -c 10- \
@@ -77,6 +79,7 @@ resources:
             - - {get_param: SSLCertificate}
               - {get_param: SSLIntermediateCertificate}
               - {get_param: SSLKey}
+
 
 outputs:
   deploy_stdout:

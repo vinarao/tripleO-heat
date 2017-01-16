@@ -34,6 +34,11 @@ parameters:
     default: '255.255.255.0'
     description: vRouter netmask
     type: string
+  DeployedSSLCertificatePath:
+    default: '/etc/pki/tls/private/overcloud_endpoint.pem'
+    description: >
+        The filepath of the certificate as it will be stored in the controller.
+    type: string
 
 resources:
   ContrailBase:
@@ -56,6 +61,7 @@ outputs:
             neutron::plugins::opencontrail::gateway: {get_param: VrouterGateway}
             neutron::plugins::opencontrail::netmask: {get_param: VrouterNetmask}
             neutron::plugins::opencontrail::metadata_proxy_shared_secret: {get_param: NeutronMetadataProxySharedSecret}
+            contrail::vrouter::service_certificate: {get_param: DeployedSSLCertificatePath}
             tripleo.neutron_compute_plugin_opencontrail.firewall_rules:
               '111 neutron_compute_plugin_opencontrail proxy':
                 dport: 8097

@@ -37,8 +37,8 @@ parameter_defaults:
   NeutronServicePlugins: ''
   NeutronTunnelTypes: ''
 #enable ssl
-  AuthProtocol: https
-  SSLCertRootDir: /etc/contrail/ssl
-  CaFile: overcloud_ca.pem
-  CertFile: overcloud.pem
-  KeyFile: overcloud.key
+#  AuthProtocol: https
+#  SSLCertRootDir: /etc/contrail/ssl
+#  CaFile: overcloud_ca.pem
+#  CertFile: overcloud.pem
+#  KeyFile: overcloud.key

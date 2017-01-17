@@ -42,7 +42,7 @@ resources:
             gpgcheck=0
             protect=1
             EOF
-            if [ `hostname |awk -F"-" '{print $2}'` == "novacompute" ]; then 
+            if [[ `hostname |awk -F"-" '{print $2}'` == "novacompute" || `hostname |awk -F"-" '{print $2}'` == "contrailtsn" ]]; then 
               yum install -y contrail-vrouter-utils
               function pkt_setup () {
                   for f in /sys/class/net/$1/queues/rx-*

@@ -91,6 +91,11 @@ parameter_defaults:
     - 10.0.0.60
     - 10.0.0.61
     - 10.0.0.62
+  ContrailTsnIPs:
+    internal_api:
+    - 10.0.0.70
+    - 10.0.0.71
+    - 10.0.0.72
   #CephStorageIPs:
     # Each ceph node will get an IP from the lists below, first node, first IP
     #storage:

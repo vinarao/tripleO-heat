@@ -25,12 +25,12 @@ parameter_defaults:
   OvercloudContrailAnalyticsDatabaseFlavor: contrail-analytics-database
   OvercloudContrailTsnFlavor: contrail-tsn
   OvercloudComputeFlavor: compute
-  ControllerCount: 1
-  ContrailControllerCount: 1
-  ContrailAnalyticsCount: 1
-  ContrailAnalyticsDatabaseCount: 1
+  ControllerCount: 3
+  ContrailControllerCount: 3
+  ContrailAnalyticsCount: 3
+  ContrailAnalyticsDatabaseCount: 3
   ContrailTsnCount: 1
-  ComputeCount: 1
+  ComputeCount: 3
   DnsServers: ["8.8.8.8","8.8.4.4"]
   NtpServer: 10.0.0.1
   NovaLibvirtCpuMode: custom

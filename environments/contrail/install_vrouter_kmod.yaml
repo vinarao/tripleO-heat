@@ -331,6 +331,7 @@ resources:
             fi
             echo finishing...
             ifconfig
+            ifconfig ${phy_int} 0.0.0.0
             ip route
           params:
             $phy_int: {get_param: VrouterPhysicalInterface}

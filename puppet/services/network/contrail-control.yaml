@@ -1,4 +1,4 @@
-heat_template_version: 2016-04-08
+heat_template_version: 2016-10-14
 
 description: >
   Contrail Control service deployment using puppet, this YAML file
@@ -27,8 +27,12 @@ parameters:
     default: 64512
   ContrailControlRNDCSecret:
     description: RNDCSecret
-    default: sHE1SM8nsySdgsoRxwARtA==
     type: string
+    hidden: true
+  ContrailControlManageNamed:
+    description: named config file mgmt
+    type: string
+    default: true
 
 resources:
   ContrailBase:
@@ -49,5 +53,6 @@ outputs:
           - contrail::control::asn: {get_param: ContrailControlASN }
             contrail::control::host_ip: {get_param: [ServiceNetMap, ContrailControlNetwork]}
             contrail::control::rndc_secret: {get_param: ContrailControlRNDCSecret}
+            contrail::control::manage_named: {get_param: ContrailControlManageNamed}
       step_config: |
         include ::tripleo::network::contrail::control

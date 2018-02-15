@@ -7,7 +7,7 @@ heat_template_version: 2014-10-16
 parameters:
   ContrailRepo:
     type: string
-    default: http://192.0.2.1/contrail-3.2.0.0-19
+    default: http://192.0.2.1/contrail
   VrouterPhysicalInterface:
     default: 'eth0'
     description: vRouter physical interface
@@ -33,6 +33,7 @@ resources:
           template: |
             #!/bin/bash
             echo c0ntrail123 | passwd root --stdin
+            echo c0ntrail123 | passwd stack --stdin
             sed -i '/\[main\]/a \ \ \ \ \parser = future' /etc/puppet/puppet.conf
             cat <<EOF > /etc/yum.repos.d/contrail.repo
             [Contrail]

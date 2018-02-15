@@ -1,4 +1,4 @@
-heat_template_version: 2016-04-08
+heat_template_version: 2016-10-14
 
 description: >
   OpenStack Neutron Opencontrail plugin
@@ -21,15 +21,9 @@ parameters:
   ContrailExtensions:
     description: List of OpenContrail extensions to be enabled
     type: comma_delimited_list
-    default: ''
+    default: 'ipam:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_ipam.NeutronPluginContrailIpam,policy:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_policy.NeutronPluginContrailPolicy,route-table:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_vpc.NeutronPluginContrailVpc,contrail:None'
 
 resources:
-#  NeutronBase:
-#    type: ../neutron-base.yaml
-#    properties:
-#      ServiceNetMap: {get_param: ServiceNetMap}
-#      DefaultPasswords: {get_param: DefaultPasswords}
-#      EndpointMap: {get_param: EndpointMap}
   ContrailBase:
     type: ./contrail-base.yaml
     properties:
@@ -41,11 +35,11 @@ outputs:
   role_data:
     description: Role data for the Neutron Opencontrail plugin
     value:
-      service_name: neutron_plugin_opencontrail
+      service_name: contrail_neutron_plugin
       config_settings:
         map_merge:
           - get_attr: [ContrailBase, role_data, config_settings]
-          - neutron::api_extensions_path: /usr/lib/python2.7/site-packages/neutron_plugin_contrail/extensions
+          - neutron::api_extensions_path: '/usr/lib/python2.7/site-packages/neutron_plugin_contrail/extensions:/usr/lib/python2.7/site-packages/neutron_lbaas/extensions'
             contrail::vrouter::contrail_extensions: {get_param: ContrailExtensions}
       step_config: |
         include tripleo::network::contrail::neutron_plugin

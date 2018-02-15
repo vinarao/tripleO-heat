@@ -1,4 +1,4 @@
-heat_template_version: 2016-04-08
+heat_template_version: 2016-10-14
 
 description: >
   Provision Contrail services after deployment
@@ -39,6 +39,5 @@ outputs:
       config_settings:
         map_merge:
           - get_attr: [ContrailBase, role_data, config_settings]
-            contrail::provision::blabla: {get_param: ContrailBlabla}
       step_config: |
         include ::tripleo::network::contrail::provision

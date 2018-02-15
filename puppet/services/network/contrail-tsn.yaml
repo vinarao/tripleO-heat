@@ -1,4 +1,4 @@
-heat_template_version: 2016-04-08
+heat_template_version: 2016-10-14
 
 description: >
   Contrail TSN Service
@@ -19,7 +19,6 @@ parameters:
                  via parameter_defaults in the resource registry.
     type: json
   NeutronMetadataProxySharedSecret:
-    default: 'secret'
     description: Metadata Secret
     type: string
   VrouterPhysicalInterface:
@@ -27,7 +26,7 @@ parameters:
     description: vRouter physical interface
     type: string
   VrouterGateway:
-    default: '192.0.2.1'
+    default: '192.168.24.1'
     description: vRouter default gateway
     type: string
   VrouterNetmask:
@@ -51,7 +50,7 @@ outputs:
       config_settings:
         map_merge:
           - get_attr: [ContrailBase, role_data, config_settings]
-          - contrail::vrouter::host_ip: {get_param: [ServiceNetMap, NeutronCorePluginOpencontrailNetwork]}
+          - contrail::vrouter::host_ip: {get_param: [ServiceNetMap, ContrailVrouterNetwork]}
             contrail::vrouter::physical_interface: {get_param: VrouterPhysicalInterface}
             contrail::vrouter::gateway: {get_param: VrouterGateway}
             contrail::vrouter::netmask: {get_param: VrouterNetmask}

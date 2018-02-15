@@ -1,4 +1,4 @@
-heat_template_version: 2016-04-08
+heat_template_version: 2016-10-14
 
 description: >
   OpenStack Neutron Compute OpenContrail plugin
@@ -19,9 +19,9 @@ parameters:
                  via parameter_defaults in the resource registry.
     type: json
   NeutronMetadataProxySharedSecret:
-    default: 'secret'
     description: Metadata Secret
     type: string
+    hidden: true
   VrouterPhysicalInterface:
     default: 'eth0'
     description: vRouter physical interface
@@ -34,6 +34,14 @@ parameters:
     default: '255.255.255.0'
     description: vRouter netmask
     type: string
+  VrouterControlNodeIps:
+    description: List of Contrail Node IPs
+    type: comma_delimited_list
+    default: ''
+  VrouterAnalyticsNodeIps:
+    description: List of Contrail Analytics IPs
+    type: comma_delimited_list
+    default: ''
 
 resources:
   ContrailBase:
@@ -47,18 +55,21 @@ outputs:
   role_data:
     description: Role data for the Neutron Compute OpenContrail plugin
     value:
-      service_name: neutron_compute_plugin_opencontrail
+      service_name: contrail_vrouter
       config_settings:
         map_merge:
           - get_attr: [ContrailBase, role_data, config_settings]
-          - contrail::vrouter::host_ip: {get_param: [ServiceNetMap, NeutronCorePluginOpencontrailNetwork]}
+          - contrail::vrouter::host_ip: {get_param: [ServiceNetMap, ContrailVrouterNetwork]}
             contrail::vrouter::physical_interface: {get_param: VrouterPhysicalInterface}
             contrail::vrouter::gateway: {get_param: VrouterGateway}
             contrail::vrouter::netmask: {get_param: VrouterNetmask}
             contrail::vrouter::metadata_proxy_shared_secret: {get_param: NeutronMetadataProxySharedSecret}
-            tripleo.neutron_compute_plugin_opencontrail.firewall_rules:
-              '111 neutron_compute_plugin_opencontrail proxy':
+            contrail::vrouter::control_node_ips: {get_param: VrouterControlNodeIps}
+            contrail::vrouter::analytics_node_ips: {get_param: VrouterAnalyticsNodeIps}
+            tripleo.contrail_vrouter.firewall_rules:
+              '111 contrail_vrouter_8085':
+                dport: 8085
+              '112 contrail_vrouter_8097':
                 dport: 8097
-                proto: tcp
       step_config: |
         include ::tripleo::network::contrail::vrouter

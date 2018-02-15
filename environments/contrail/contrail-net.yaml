@@ -1,28 +1,44 @@
 resource_registry:
-  OS::TripleO::Compute::Net::SoftwareConfig: contrail-nic-config-compute.yaml
-  OS::TripleO::Controller::Net::SoftwareConfig: contrail-nic-config.yaml
-  OS::TripleO::ContrailController::Net::SoftwareConfig: contrail-nic-config.yaml
-  OS::TripleO::ContrailAnalytics::Net::SoftwareConfig: contrail-nic-config.yaml
-  OS::TripleO::ContrailAnalyticsDatabase::Net::SoftwareConfig: contrail-nic-config.yaml
-  OS::TripleO::ContrailTsn::Net::SoftwareConfig: contrail-nic-config-compute.yaml
-  OS::TripleO::AllNodes::Validation: skip-validation.yaml
-
+  OS::TripleO::Controller::Net::SoftwareConfig: ../../network/config/contrail/contrail-nic-config.yaml
+  OS::TripleO::ContrailController::Net::SoftwareConfig: ../../network/config/contrail/contrail-nic-config.yaml
+  OS::TripleO::ContrailAnalytics::Net::SoftwareConfig: ../../network/config/contrail/contrail-nic-config.yaml
+  OS::TripleO::ContrailAnalyticsDatabase::Net::SoftwareConfig: ../../network/config/contrail/contrail-nic-config.yaml
+  OS::TripleO::Compute::Net::SoftwareConfig: ../../network/config/contrail/contrail-nic-config-compute.yaml
+  OS::TripleO::ContrailTsn::Net::SoftwareConfig: ../../network/config/contrail/contrail-nic-config-compute.yaml
 
 parameter_defaults:
-  ControlPlaneSubnetCidr: '24'
-  ControlPlaneDefaultRoute: 192.0.2.254
   InternalApiNetCidr: 10.0.0.0/24
-  InternalApiAllocationPools: [{'start': '10.0.0.10', 'end': '10.0.0.200'}]
   InternalApiDefaultRoute: 10.0.0.1
-  ManagementNetCidr: 10.1.0.0/24
-  ManagementAllocationPools: [{'start': '10.1.0.10', 'end': '10.1.0.200'}]
-  ManagementInterfaceDefaultRoute: 10.1.0.1
-  ExternalNetCidr: 10.2.0.0/24
-  ExternalAllocationPools: [{'start': '10.2.0.10', 'end': '10.2.0.200'}]
-  EC2MetadataIp: 192.0.2.1  # Generally the IP of the Undercloud
-  DnsServers: ["8.8.8.8","8.8.4.4"]
-  VrouterPhysicalInterface: eth1
+  InternalApiAllocationPools: [{'start': '10.0.0.11', 'end': '10.0.0.200'}]
+  ManagementNetCidr: 10.2.0.0/24
+  ManagementInterfaceDefaultRoute: 10.2.0.1
+  ManagementAllocationPools: [{'start': '10.2.0.11', 'end': '10.2.0.200'}]
+  ManagementVlanID: 20
+  ControlPlaneNetCidr: 192.0.2.0/24
+  ControlPlaneSubnetCidr: '24'
+  ControlPlaneDefaultRoute: 192.0.2.1
+  StorageNetCidr: 10.3.0.0/24
+  StorageDefaultRoute: 10.3.0.1
+  StorageAllocationPools: [{'start': '10.3.0.11', 'end': '10.3.0.200'}]
+  StorageVlanID: 30
+  StorageMgmtNetCidr: 10.4.0.0/24
+  StorageMgmtDefaultRoute: 10.4.0.1
+  StorageMgmtAllocationPools: [{'start': '10.4.0.11', 'end': '10.4.0.200'}]
+  StorageMgmtVlanID: 40
+  ExternalNetCidr: 10.87.0.0/24
+  ExternalDefaultRoute: 10.87.0.126
+  ExternalAllocationPools: [{'start': '10.87.0.1', 'end': '10.87.0.200'}]
+  EC2MetadataIp: 192.168.0.2.1  # Generally the IP of the Undercloud
+  DnsServers: ["8.8.8.8"]
+  NtpServer: 10.0.0.1
+  ContrailVrouterPhysicalInterface: eno2
+  VrouterPhysicalInterface: eno2
+  ContrailVrouterGateway: 10.0.0.1
   VrouterGateway: 10.0.0.1
+  ContrailVrouterNetmask: 255.255.255.0
   VrouterNetmask: 255.255.255.0
   ControlVirtualInterface: eth0
   PublicVirtualInterface: vlan10
+
+
+

@@ -1,9 +1,13 @@
-heat_template_version: 2016-04-08
+heat_template_version: queens
 
 description: >
   Openstack Manila base service. Shared by manila-api/scheduler/share services
 
 parameters:
+  ServiceData:
+    default: {}
+    description: Dictionary packing service data
+    type: json
   ServiceNetMap:
     default: {}
     description: Mapping of service_name -> network name. Typically set
@@ -13,15 +17,33 @@ parameters:
   DefaultPasswords:
     default: {}
     type: json
+  RoleName:
+    default: ''
+    description: Role name on which the service is applied
+    type: string
+  RoleParameters:
+    default: {}
+    description: Parameters specific to the role
+    type: json
   EndpointMap:
     default: {}
     description: Mapping of service endpoint -> protocol. Typically set
                  via parameter_defaults in the resource registry.
     type: json
+  ManilaIPv6:
+    default: False
+    description: Set to True to enable IPv6 access in manila.
+    type: boolean
   Debug:
-    default: ''
+    default: false
     description: Set to True to enable debugging on all services.
+    type: boolean
+  ManilaDebug:
+    default: ''
+    description: Set to True to enable debugging Manila services.
     type: string
+    constraints:
+      - allowed_values: [ '', 'true', 'True', 'TRUE', 'false', 'False', 'FALSE']
   RabbitPassword:
     description: The password for RabbitMQ
     type: string
@@ -44,6 +66,16 @@ parameters:
     description: The password for the manila service account.
     type: string
     hidden: true
+  NotificationDriver:
+    type: string
+    default: 'messagingv2'
+    description: Driver or drivers to handle sending notifications.
+    constraints:
+      - allowed_values: [ 'messagingv2', 'noop' ]
+
+conditions:
+  service_debug_unset: {equals : [{get_param: ManilaDebug}, '']}
+  manila_ipv6: {equals : [{get_param: ManilaIPv6}, true]}
 
 outputs:
   role_data:
@@ -51,22 +83,31 @@ outputs:
     value:
       service_name: manila_base
       config_settings:
+        manila::notification_driver: {get_param: NotificationDriver}
         manila::rabbit_userid: {get_param: RabbitUserName}
         manila::rabbit_password: {get_param: RabbitPassword}
         manila::rabbit_use_ssl: {get_param: RabbitClientUseSSL}
         manila::rabbit_port: {get_param: RabbitClientPort}
-        manila::debug: {get_param: Debug}
+        manila::debug:
+          if:
+          - service_debug_unset
+          - {get_param: Debug }
+          - {get_param: ManilaDebug }
         manila::db::database_db_max_retries: -1
         manila::db::database_max_retries: -1
         manila::sql_connection:
-          list_join:
-          - ''
-          - - {get_param: [EndpointMap, MysqlInternal, protocol]}
-            - '://manila:'
-            - {get_param: ManilaPassword}
-            - '@'
-            - {get_param: [EndpointMap, MysqlInternal, host]}
-            - '/manila'
+          make_url:
+            scheme: {get_param: [EndpointMap, MysqlInternal, protocol]}
+            username: manila
+            password: {get_param: ManilaPassword}
+            host: {get_param: [EndpointMap, MysqlInternal, host]}
+            path: /manila
+            query:
+              read_default_file: /etc/my.cnf.d/tripleo.cnf
+              read_default_group: tripleo
+        manila::network::neutron::network_plugin_ipv6_enabled: {get_param: ManilaIPv6}
+        # Currently the address family parameters are mutually exclusive
+        manila::network::neutron::network_plugin_ipv4_enabled: {if: ["manila_ipv6", false, true]}
       service_config_settings:
         mysql:
           manila::db::mysql::password: {get_param: ManilaPassword}

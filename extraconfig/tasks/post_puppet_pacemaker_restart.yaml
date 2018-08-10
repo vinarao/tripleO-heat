@@ -1,4 +1,4 @@
-heat_template_version: 2014-10-16
+heat_template_version: queens
 description: 'Post-Puppet restart config for Pacemaker deployments'
 
 parameters:
@@ -23,6 +23,7 @@ resources:
   ControllerPostPuppetRestartDeployment:
     type: OS::Heat::SoftwareDeployments
     properties:
-      servers:  {get_param: servers}
+      name: ControllerPostPuppetRestartDeployment
+      servers: {get_param: servers}
       config: {get_resource: ControllerPostPuppetRestartConfig}
       input_values: {get_param: input_values}

@@ -1,9 +1,13 @@
-heat_template_version: 2016-04-08
+heat_template_version: queens
 
 description: >
   Keepalived service configured with Puppet
 
 parameters:
+  ServiceData:
+    default: {}
+    description: Dictionary packing service data
+    type: json
   ServiceNetMap:
     default: {}
     description: Mapping of service_name -> network name. Typically set
@@ -13,24 +17,41 @@ parameters:
   DefaultPasswords:
     default: {}
     type: json
+  RoleName:
+    default: ''
+    description: Role name on which the service is applied
+    type: string
+  RoleParameters:
+    default: {}
+    description: Parameters specific to the role
+    type: json
   EndpointMap:
     default: {}
     description: Mapping of service endpoint -> protocol. Typically set
                  via parameter_defaults in the resource registry.
     type: json
   ControlVirtualInterface:
-    default: 'br-ex'
-    description: Interface where virtual ip will be assigned.
+    default: ''
+    description: >
+        Interface where virtual ip will be assigned.  This value will be
+        automatically set by the deployment tool.  Overriding here will
+        override automatic setting.
     type: string
   PublicVirtualInterface:
-    default: 'br-ex'
+    default: ''
     description: >
-        Specifies the interface where the public-facing virtual ip will be assigned.
-        This should be int_public when a VLAN is being used.
+        Interface where virtual ip will be assigned.  This value will be
+        automatically set by the deployment tool.  Overriding here will
+        override automatic setting.
     type: string
   MonitoringSubscriptionKeepalived:
     default: 'overcloud-keepalived'
     type: string
+
+conditions:
+
+  control_iface_empty: {equals : [{get_param: ControlVirtualInterface}, '']}
+  public_iface_empty: {equals : [{get_param: PublicVirtualInterface}, '']}
 
 outputs:
   role_data:
@@ -39,10 +60,27 @@ outputs:
       service_name: keepalived
       monitoring_subscription: {get_param: MonitoringSubscriptionKeepalived}
       config_settings:
-        tripleo::keepalived::control_virtual_interface: {get_param: ControlVirtualInterface}
-        tripleo::keepalived::public_virtual_interface: {get_param: PublicVirtualInterface}
-        tripleo.keepalived.firewall_rules:
-          '106 keepalived vrrp':
-            proto: vrrp
+        map_merge:
+        - tripleo.keepalived.firewall_rules:
+            '106 keepalived vrrp':
+              proto: vrrp
+        -
+          if:
+          - control_iface_empty
+          - {}
+          - tripleo::keepalived::control_virtual_interface: {get_param: ControlVirtualInterface}
+        -
+          if:
+          - public_iface_empty
+          - {}
+          - tripleo::keepalived::public_virtual_interface: {get_param: PublicVirtualInterface}
       step_config: |
         include ::tripleo::profile::base::keepalived
+      upgrade_tasks:
+        - name: Stop keepalived service
+          when: step|int == 1
+          service: name=keepalived state=stopped
+        - name: Start keepalived service
+          when: step|int == 4 # Needed at step 4 for mysql
+          service: name=keepalived state=started
+

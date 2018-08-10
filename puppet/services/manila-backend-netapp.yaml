@@ -1,12 +1,9 @@
-heat_template_version: 2016-04-08
+heat_template_version: queens
 
 description: >
   Openstack Manila netapp backend.
 
 parameters:
-  ManilaNetappEnableBackend:
-    type: boolean
-    default: false
   ManilaNetappDriverHandlesShareServers:
     type: string
     default: true
@@ -67,6 +64,10 @@ parameters:
   ManilaNetappSnapmirrorQuiesceTimeout:
     type: number
     default: 3600
+  ServiceData:
+    default: {}
+    description: Dictionary packing service data
+    type: json
   ServiceNetMap:
     default: {}
     description: Mapping of service_name -> network name. Typically set
@@ -75,6 +76,14 @@ parameters:
     type: json
   DefaultPasswords:
     default: {}
+    type: json
+  RoleName:
+    default: ''
+    description: Role name on which the service is applied
+    type: string
+  RoleParameters:
+    default: {}
+    description: Parameters specific to the role
     type: json
   EndpointMap:
     default: {}
@@ -88,7 +97,6 @@ outputs:
     value:
       service_name: manila_backend_netapp
       config_settings:
-        manila_netapp_enable_backend: {get_param: ManilaNetappEnableBackend}
         manila::backend::netapp::title: {get_param: ManilaNetappBackendName}
         manila::backend::netapp::netapp_login: {get_param: ManilaNetappLogin}
         manila::backend::netapp::driver_handles_share_servers: {get_param: ManilaNetappDriverHandlesShareServers}

@@ -1,9 +1,13 @@
-heat_template_version: 2016-04-08
+heat_template_version: queens
 
 description: >
   OpenStack Neutron ML2 Plugin configured with Puppet
 
 parameters:
+  ServiceData:
+    default: {}
+    description: Dictionary packing service data
+    type: json
   ServiceNetMap:
     default: {}
     description: Mapping of service_name -> network name. Typically set
@@ -12,6 +16,14 @@ parameters:
     type: json
   DefaultPasswords:
     default: {}
+    type: json
+  RoleName:
+    default: ''
+    description: Role name on which the service is applied
+    type: string
+  RoleParameters:
+    default: {}
+    description: Parameters specific to the role
     type: json
   EndpointMap:
     default: {}
@@ -41,8 +53,8 @@ parameters:
     default: 'datacentre:1:1000'
     description: >
       The Neutron ML2 and OpenVSwitch vlan mapping range to support. See the
-      Neutron documentation for permitted values. Defaults to permitting any
-      VLAN on the 'datacentre' physical network (See NeutronBridgeMappings).
+      Neutron documentation for permitted values. Defaults to permitting VLANs
+      1 to 1000 on the 'datacentre' physical network (See NeutronBridgeMappings).
     type: comma_delimited_list
   NeutronTunnelIdRanges:
     description: |
@@ -60,20 +72,27 @@ parameters:
     default: 'vxlan'
     description: The tenant network type for Neutron.
     type: comma_delimited_list
-  NeutronSupportedPCIVendorDevs:
-    description: |
-        List of supported pci vendor devices in the format VendorID:ProductID.
-        By default Intel & Mellanox SR-IOV capable NICs are supported.
-    type: comma_delimited_list
-    default: ['15b3:1004','8086:10ca']
+  NeutronFirewallDriver:
+    description: Firewall driver for realizing neutron security group function
+    type: string
+    default: 'iptables_hybrid'
+  NeutronOverlayIPVersion:
+    default: 4
+    description: IP version used for all overlay network endpoints.
+    type: number
+    constraints:
+    - allowed_values: [4,6]
 resources:
 
   NeutronBase:
     type: ./neutron-base.yaml
     properties:
+      ServiceData: {get_param: ServiceData}
       ServiceNetMap: {get_param: ServiceNetMap}
       DefaultPasswords: {get_param: DefaultPasswords}
       EndpointMap: {get_param: EndpointMap}
+      RoleName: {get_param: RoleName}
+      RoleParameters: {get_param: RoleParameters}
 
 outputs:
   role_data:
@@ -83,47 +102,21 @@ outputs:
       config_settings:
         map_merge:
           - get_attr: [NeutronBase, role_data, config_settings]
-          - neutron::plugins::ml2::mechanism_drivers:
-              str_replace:
-                template: MECHANISMS
-                params:
-                  MECHANISMS: {get_param: NeutronMechanismDrivers}
-            neutron::plugins::ml2::type_drivers:
-              str_replace:
-                template: DRIVERS
-                params:
-                  DRIVERS: {get_param: NeutronTypeDrivers}
-            neutron::plugins::ml2::flat_networks:
-              str_replace:
-                template: NETWORKS
-                params:
-                  NETWORKS: {get_param: NeutronFlatNetworks}
-            neutron::plugins::ml2::extension_drivers:
-              str_replace:
-                template: PLUGIN_EXTENSIONS
-                params:
-                  PLUGIN_EXTENSIONS: {get_param: NeutronPluginExtensions}
-            neutron::plugins::ml2::network_vlan_ranges:
-              str_replace:
-                template: RANGES
-                params:
-                  RANGES: {get_param: NeutronNetworkVLANRanges}
-            neutron::plugins::ml2::tunnel_id_ranges:
-              str_replace:
-                template: RANGES
-                params:
-                  RANGES: {get_param: NeutronTunnelIdRanges}
-            neutron::plugins::ml2::vni_ranges:
-              str_replace:
-                template: RANGES
-                params:
-                  RANGES: {get_param: NeutronVniRanges}
-            neutron::plugins::ml2::tenant_network_types:
-              str_replace:
-                template: TYPES
-                params:
-                  TYPES: {get_param: NeutronNetworkType}
-            neutron::plugins::ml2::supported_pci_vendor_devs: {get_param: NeutronSupportedPCIVendorDevs}
+          - neutron::plugins::ml2::mechanism_drivers: {get_param: NeutronMechanismDrivers}
+            neutron::plugins::ml2::type_drivers: {get_param: NeutronTypeDrivers}
+            neutron::plugins::ml2::flat_networks: {get_param: NeutronFlatNetworks}
+            neutron::plugins::ml2::extension_drivers: {get_param: NeutronPluginExtensions}
+            neutron::plugins::ml2::network_vlan_ranges: {get_param: NeutronNetworkVLANRanges}
+            neutron::plugins::ml2::tunnel_id_ranges: {get_param: NeutronTunnelIdRanges}
+            neutron::plugins::ml2::vni_ranges: {get_param: NeutronVniRanges}
+            neutron::plugins::ml2::tenant_network_types: {get_param: NeutronNetworkType}
+            neutron::plugins::ml2::firewall_driver: {get_param: NeutronFirewallDriver}
+            neutron::plugins::ml2::overlay_ip_version: {get_param: NeutronOverlayIPVersion}
 
       step_config: |
         include ::tripleo::profile::base::neutron::plugins::ml2
+      service_config_settings:
+        horizon:
+          neutron::plugins::ml2::mechanism_drivers: {get_param: NeutronMechanismDrivers}
+      metadata_settings:
+        get_attr: [NeutronBase, role_data, metadata_settings]

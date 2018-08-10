@@ -1,0 +1,195 @@
+heat_template_version: queens
+
+description: >
+  Contrail containerized Config Databse service
+
+parameters:
+  DockerContrailCassandraImageName:
+    description: image
+    type: string
+    default: "contrail-external-cassandra"
+  DockerContrailZookeeperImageName:
+    description: image
+    type: string
+    default: "contrail-external-zookeeper"
+  DockerContrailRabbitmqImageName:
+    description: image
+    type: string
+    default: "contrail-external-rabbitmq"
+  EndpointMap:
+    default: {}
+    description: Mapping of service endpoint -> protocol. Typically set
+                 via parameter_defaults in the resource registry.
+    type: json
+  ServiceData:
+    default: {}
+    description: Dictionary packing service data
+    type: json
+  ServiceNetMap:
+    default: {}
+    description: Mapping of service_name -> network name. Typically set
+                 via parameter_defaults in the resource registry.  This
+                 mapping overrides those in ServiceNetMapDefaults.
+    type: json
+  DefaultPasswords:
+    default: {}
+    type: json
+  RoleName:
+    default: ''
+    description: Role name on which the service is applied
+    type: string
+  RoleParameters:
+    default: {}
+    description: Parameters specific to the role
+    type: json
+
+resources:
+  ContainersCommon:
+    type: ../containers-common.yaml
+
+  ContrailBase:
+    type: contrail-base.yaml
+    properties:
+      EndpointMap: {get_param: EndpointMap}
+      ServiceData: {get_param: ServiceData}
+      ServiceNetMap: {get_param: ServiceNetMap}
+      DefaultPasswords: {get_param: DefaultPasswords}
+      RoleName: {get_param: RoleName}
+      RoleParameters: {get_param: RoleParameters}
+
+outputs:
+  role_data:
+    description: Role data for the Contrail Config Database service.
+    value:
+      service_name: contrail_database
+      config_settings:
+        map_merge:
+          - get_attr: [ContrailBase, role_data, config_settings]
+      service_config_settings: {get_attr: [ContrailBase, role_data, service_config_settings]}
+      docker_config:
+        step_4:
+          contrail_config_database:
+            image: &contrail_config_database_image
+              list_join:
+                - ''
+                - - {get_attr: [ContrailBase, role_data, contrail_registry]}
+                  - '/'
+                  - {get_param: DockerContrailCassandraImageName}
+                  - ':'
+                  - {get_attr: [ContrailBase, role_data, contrail_imagetag]}
+            net: host
+            privileged: false
+            detach: true
+            user: root
+            restart: always
+            volumes:
+              list_concat:
+                - {get_attr: [ContrailBase, role_data, contrail_base_volumes]}
+                - - config_cassandra:/var/lib/cassandra/data
+            environment:
+              - "NODE_TYPE=config"
+            env_file:
+              - /etc/contrail/common.env
+          contrail_config_zookeeper:
+            image: &contrail_config_zookeeper_image
+              list_join:
+                - ''
+                - - {get_attr: [ContrailBase, role_data, contrail_registry]}
+                  - '/'
+                  - {get_param: DockerContrailZookeeperImageName}
+                  - ':'
+                  - {get_attr: [ContrailBase, role_data, contrail_imagetag]}
+            net: host
+            privileged: false
+            detach: true
+            user: root
+            restart: always
+            volumes:
+              list_concat:
+                - {get_attr: [ContrailBase, role_data, contrail_base_volumes]}
+                - - config_zookeeper:/data
+                  - config_zookeeper:/datalog
+            env_file:
+              - /etc/contrail/common.env
+            environment:
+              - "NODE_TYPE=config"
+          contrail_config_rabbitmq:
+            image: &contrail_config_rabbitmq_image
+              list_join:
+                - ''
+                - - {get_attr: [ContrailBase, role_data, contrail_registry]}
+                  - '/'
+                  - {get_param: DockerContrailRabbitmqImageName}
+                  - ':'
+                  - {get_attr: [ContrailBase, role_data, contrail_imagetag]}
+            net: host
+            privileged: false
+            detach: true
+            user: root
+            restart: always
+            volumes:
+              get_attr: [ContrailBase, role_data, contrail_base_volumes]
+            env_file:
+              - /etc/contrail/common.env
+            environment:
+              - "NODE_TYPE=config"
+      host_prep_tasks:
+        - name: create contrail directories
+          file:
+            path: "{{ item }}"
+            state: directory
+            recurse: yes
+          with_items:
+            - /var/log/containers/contrail
+            - /etc/contrail/ssl
+        - name: register /etc/contrail/common.env
+          stat:
+            path: /etc/contrail/common.env
+          register: p
+        - name: create /etc/contrail/common.env
+          copy:
+            dest: /etc/contrail/common.env
+            content: ""
+          when: not p.stat.exists
+        - name: get service_config
+          set_fact:
+            service_configs: "{{ lookup('file', '/etc/puppet/hieradata/service_configs.json') | from_json }}"
+        - name: get contrail_settings
+          set_fact:
+            contrail_settings: "{{ service_configs.contrail_settings }}"
+          when: service_configs is defined
+        - name: write contrail settings to file
+          lineinfile: dest=/etc/contrail/common.env regexp="^{{ item.key }}.*" line="{{ item.key }}={{ item.value }}" state=present
+          with_dict: "{{ contrail_settings }}"
+          when: contrail_settings is defined
+        - name: get contrail config database node ips
+          shell: hiera -c /etc/puppet/hiera.yaml contrail_database_node_ips
+          register: contrail_config_database_node_ips_list
+        - name: turn contrail config db ips into json
+          set_fact:
+            contrail_config_database_node_ips_json: "{{ contrail_config_database_node_ips_list.stdout | from_json }}"
+        - name: turn json into comma separated string
+          set_fact:
+            contrail_config_database_node_ips_string: "{{ contrail_config_database_node_ips_json | join(',') }}"
+        - name: write contrail config db node ips to environment file
+          lineinfile: dest=/etc/contrail/common.env regexp='^CASSANDRA_SEEDS.*' line="CASSANDRA_SEEDS={{ contrail_config_database_node_ips_string }}" state=present
+        - name: write contrail config zk node ips to environment file
+          lineinfile: dest=/etc/contrail/common.env regexp='^ZOOKEEPER_NODES.*' line="ZOOKEEPER_NODES={{ contrail_config_database_node_ips_string }}" state=present
+        - name: write contrail config RMQ node ips to environment file
+          lineinfile: dest=/etc/contrail/common.env regexp='^RABBITMQ_NODES.*' line="RABBITMQ_NODES={{ contrail_config_database_node_ips_string }}" state=present
+        - name: write remaining contrail config env cars
+          lineinfile: dest=/etc/contrail/common.env line="{{ item }}" state=present
+          with_items:
+            - CASSANDRA_START_RPC=true
+            - CASSANDRA_CLUSTER_NAME=contrail_database
+            - CASSANDRA_PORT=9161
+            - CASSANDRA_CQL_PORT=9041
+            - CASSANDRA_SSL_STORAGE_PORT=7013
+            - CASSANDRA_STORAGE_PORT=7012
+            - CASSANDRA_JMX_LOCAL_PORT=7201
+            - ZOOKEEPER_PORTS=2888:3888
+            - ZOOKEEPER_PORT=2181
+            - RABBITMQ_ERLANG_COOKIE=abcdefg
+            - RABBITMQ_NODE_PORT=5673
+      metadata_settings:
+        get_attr: [ContrailBase, role_data, metadata_settings]

@@ -1,0 +1,209 @@
+heat_template_version: queens
+
+# NOTE: You don't need to pass the parameter explicitly from the
+# parent template, it can be specified via the parameter_defaults
+# in the resource_registry instead, if you want to override the default
+# and/or share values with other templates in the tree.
+parameters:
+  RoleParameters:
+    type: json
+    description: Role Specific parameters
+    default: {}
+  ServiceNames:
+    type: comma_delimited_list
+    default: []
+  deployment_actions:
+    default: ['CREATE']
+    type: comma_delimited_list
+    description: >
+      List of stack actions that will trigger any deployments in this
+      templates. The actions will be an empty list of the server is in the
+      toplevel DeploymentServerBlacklist parameter's value.
+  server:
+    type: string
+  ContrailDpdkHugepages2MB:
+    default: '2048'
+    description: Number of 2MB hugepages
+    type: string
+  ContrailDpdkHugepages1GB:
+    default: ''
+    description: Number of 1GB hugepages
+    type: string
+  ContrailDpdkDriver:
+    default: 'uio_pci_generic'
+    description: DPDK Nic Driver
+    type: string
+  ContrailRegistry:
+    default: 'opencontrailnightly'
+    description: Contrail Registry
+    type: string
+  ContrailImageTag:
+    default: 'latest'
+    description: Contrail container image tag
+    type: string
+  DockerContrailVrouterKernelInitDpdkImageName:
+    description: image
+    type: string
+    default: "contrail-vrouter-kernel-init-dpdk"
+  DockerContrailVrouterAgentDpdkContainerName:
+    description: image
+    type: string
+    default: "contrail-vrouter-agent-dpdk"
+  DockerContrailVrouterAgentContainerName:
+    description: image
+    type: string
+    default: "contrail-vrouter-agent"
+
+description: >
+  This template installs the Contrail dpdk packages in order
+  to bring vhost0 interface up. Vhost0 interface must be up before
+  os-net-config takes over.
+
+conditions:
+  is_kernel_config_required:
+    or:
+      - {not: {equals: [{get_param: ContrailDpdkHugepages1GB}, ""]}}
+      - {equals: [{get_param: ContrailDpdkDriver}, "vfio-pci"]}
+  deployment_actions_empty:
+    equals:
+      - {get_param: deployment_actions}
+      - []
+
+resources:
+  DpdkHostParametersConfig:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ansible
+      inputs:
+        - name: _CONTRAIL_REGISTRY_
+        - name: _CONTRAIL_IMAGETAG_
+        - name: _CONTRAIL_VROUTER_INIT_IMAGE_
+        - name: _CONTRAIL_VROUTER_AGENT_DPDK_CONTAINER_NAME_
+        - name: _CONTRAIL_VROUTER_AGENT_CONTAINER_NAME_
+        - name: _CONTRAIL_HUGEPAGES_1GB_
+        - name: _CONTRAIL_HUGEPAGES_2MB_
+      outputs:
+        - name: result
+      config:
+        get_file: contrail_ansible_host_config.yaml
+
+  DpdkHostParametersDeployment:
+    type: OS::Heat::SoftwareDeployment
+    properties:
+      name: DpdkHostParametersDeployment
+      server:  {get_param: server}
+      config: {get_resource: DpdkHostParametersConfig}
+      actions:
+        if:
+          - deployment_actions_empty
+          - []
+          - ['CREATE'] # Only do this on CREATE
+      input_values:
+        _CONTRAIL_REGISTRY_: {get_param: ContrailRegistry}
+        _CONTRAIL_IMAGETAG_: {get_param: ContrailImageTag}
+        _CONTRAIL_VROUTER_INIT_IMAGE_: {get_param: DockerContrailVrouterKernelInitDpdkImageName}
+        _CONTRAIL_VROUTER_AGENT_DPDK_CONTAINER_NAME_: {get_param: DockerContrailVrouterAgentDpdkContainerName}
+        _CONTRAIL_VROUTER_AGENT_CONTAINER_NAME_: {get_param: DockerContrailVrouterAgentContainerName}
+        _CONTRAIL_HUGEPAGES_1GB_: {get_param: ContrailDpdkHugepages1GB}
+        _CONTRAIL_HUGEPAGES_2MB_: {get_param: ContrailDpdkHugepages2MB}
+        _IS_DPDK_: "True"
+
+  DpdkKernelParametersConfig:
+    type: OS::Heat::SoftwareConfig
+    condition: is_kernel_config_required
+    properties:
+      group: ansible
+      inputs:
+        - name: _CONTRAIL_DPDK_DRIVER_
+        - name: _CONTRAIL_HUGEPAGES_2MB_
+        - name: _CONTRAIL_HUGEPAGES_1GB_
+      outputs:
+        - name: result
+      config:
+        get_file: contrail_ansible_kernel_config.yaml
+
+  DpdkKernelParametersDeployment:
+    type: OS::Heat::SoftwareDeployment
+    depends_on: [DpdkHostParametersDeployment]
+    condition: is_kernel_config_required
+    properties:
+      name: DpdkKernelParametersDeployment
+      server:  {get_param: server}
+      config: {get_resource: DpdkKernelParametersConfig}
+      actions:
+        if:
+          - deployment_actions_empty
+          - []
+          - ['CREATE'] # Only do this on CREATE
+      input_values:
+        _CONTRAIL_DPDK_DRIVER_: {get_param: ContrailDpdkDriver}
+        _CONTRAIL_HUGEPAGES_2MB_: {get_param: ContrailDpdkHugepages2MB}
+        _CONTRAIL_HUGEPAGES_1GB_: {get_param: ContrailDpdkHugepages1GB}
+
+  RebootConfig:
+    type: OS::Heat::SoftwareConfig
+    condition: is_kernel_config_required
+    properties:
+      group: script
+      config: |
+        #!/bin/bash
+        # Stop os-collect-config to avoid any race collecting another
+        # deployment before reboot happens
+        systemctl stop os-collect-config.service
+        /sbin/reboot
+
+  RebootDeployment:
+    type: OS::Heat::SoftwareDeployment
+    depends_on: [DpdkKernelParametersDeployment]
+    condition: is_kernel_config_required
+    properties:
+      name: RebootDeployment
+      server:  {get_param: server}
+      config: {get_resource: RebootConfig}
+      actions:
+        if:
+          - deployment_actions_empty
+          - []
+          - ['CREATE'] # Only do this on CREATE
+      signal_transport: NO_SIGNAL
+
+  RebootEnsureConfig:
+    type: OS::Heat::SoftwareConfig
+    #condition: is_kernel_config_required
+    properties:
+      group: script
+      config: |
+        #!/bin/bash
+        echo "Reboot completed"
+
+  RebootEnsureDeployment:
+    type: OS::Heat::SoftwareDeployment
+    depends_on: RebootDeployment
+    condition: is_kernel_config_required
+    properties:
+      name: RebootEnsureDeployment
+      server:  {get_param: server}
+      config: {get_resource: RebootEnsureConfig}
+      actions:
+        if:
+          - deployment_actions_empty
+          - []
+          - ['CREATE'] # Only do this on CREATE
+
+outputs:
+  result:
+    condition: is_kernel_config_required
+    value:
+      get_attr: [DpdkKernelParametersDeployment, result]
+  stdout:
+    condition: is_kernel_config_required
+    value:
+      get_attr: [DpdkKernelParametersDeployment, deploy_stdout]
+  stderr:
+    condition: is_kernel_config_required
+    value:
+      get_attr: [DpdkKernelParametersDeployment, deploy_stderr]
+  status_code:
+    condition: is_kernel_config_required
+    value:
+      get_attr: [DpdkKernelParametersDeployment, deploy_status_code]

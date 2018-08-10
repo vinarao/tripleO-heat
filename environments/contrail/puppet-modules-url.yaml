@@ -1,4 +1,0 @@
-# Heat environment to deploy artifacts via Swift Temp URL(s)
-parameter_defaults:
-  DeployArtifactURLs:
-    - 'http://192.0.2.1:8080/v1/AUTH_0d139f6d39564fe48009210a097d6862/overcloud-artifacts/puppet-modules.tar.gz?temp_url_sig=b34eaa5268b4b0a078b52cb94b54bc9dbc4a627a&temp_url_expires=1512130174'

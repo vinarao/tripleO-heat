@@ -1,9 +1,13 @@
-heat_template_version: 2016-04-08
+heat_template_version: queens
 
 description: >
   TripleO Firewall settings
 
 parameters:
+  ServiceData:
+    default: {}
+    description: Dictionary packing service data
+    type: json
   ServiceNetMap:
     default: {}
     description: Mapping of service_name -> network name. Typically set
@@ -12,6 +16,14 @@ parameters:
     type: json
   DefaultPasswords:
     default: {}
+    type: json
+  RoleName:
+    default: ''
+    description: Role name on which the service is applied
+    type: string
+  RoleParameters:
+    default: {}
+    description: Parameters specific to the role
     type: json
   EndpointMap:
     default: {}
@@ -37,3 +49,9 @@ outputs:
         tripleo::firewall::purge_firewall_rules: {get_param: PurgeFirewallRules}
       step_config: |
         include ::tripleo::firewall
+      upgrade_tasks:
+        - name: blank ipv6 rule before activating ipv6 firewall.
+          when: step|int == 3
+          shell: cat /etc/sysconfig/ip6tables > /etc/sysconfig/ip6tables.n-o-upgrade; cat</dev/null>/etc/sysconfig/ip6tables
+          args:
+            creates: /etc/sysconfig/ip6tables.n-o-upgrade

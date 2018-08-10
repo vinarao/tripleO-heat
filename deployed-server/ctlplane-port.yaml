@@ -1,7 +1,20 @@
-heat_template_version: 2014-10-16
+heat_template_version: queens
 
 parameters:
-  Hostname:
+  network:
+    type: string
+    default: ctlplane
+  fixed_ips:
+    default: []
+    type: json
+  name:
+    type: string
+  replacement_policy:
+    type: string
+    default: AUTO
+  ControlPlaneSubnet:
+    default: ctlplane-subnet
+    description: The name of the undercloud Neutron control plane subnet
     type: string
 
 resources:
@@ -10,14 +23,14 @@ resources:
     type: OS::Neutron::Port
     properties:
       network: ctlplane
+      fixed_ips: [{subnet: {get_param: ControlPlaneSubnet}}]
       name:
         list_join:
           - '-'
-          - - {get_param: Hostname}
-            - ctlplane
+          - - {get_param: name}
             - port
       replacement_policy: AUTO
 
 outputs:
-  ip_address:
-    value: {get_attr: [ControlPlanePort, fixed_ips, 0, ip_address]}
+  fixed_ips:
+    value: {get_attr: [ControlPlanePort, fixed_ips]}

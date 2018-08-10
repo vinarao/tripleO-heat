@@ -1,0 +1,216 @@
+heat_template_version: queens
+
+# NOTE: You don't need to pass the parameter explicitly from the
+# parent template, it can be specified via the parameter_defaults
+# in the resource_registry instead, if you want to override the default
+# and/or share values with other templates in the tree.
+parameters:
+  RoleParameters:
+    type: json
+    description: Role Specific parameters
+    default: {}
+  ServiceNames:
+    type: comma_delimited_list
+    default: []
+  deployment_actions:
+    default: ['CREATE']
+    type: comma_delimited_list
+    description: >
+      List of stack actions that will trigger any deployments in this
+      templates. The actions will be an empty list of the server is in the
+      toplevel DeploymentServerBlacklist parameter's value.
+  server:
+    type: string
+  ContrailSriovHugepages2MB:
+    default: '2048'
+    description: Number of 2MB hugepages
+    type: string
+  ContrailSriovHugepages1GB:
+    default: ''
+    description: Number of 1GB hugepages
+    type: string
+  ContrailSriovNumVFs:
+    description: >
+      Provide the list of VFs to be reserved for each SR-IOV interface.
+      Format "<interface_name1>:<numvfs1>,<interface_name2>:<numvfs2>"
+      Example "eth1:4096,eth2:128"
+    type: comma_delimited_list
+    default: ""
+  ContrailDpdkDriver:
+    default: 'uio_pci_generic'
+    description: DPDK Nic Driver
+    type: string
+  ContrailSriovMode:
+    default: 'vrouter'
+    type: string
+  ContrailRegistry:
+    default: 'opencontrailnightly'
+    description: Contrail Registry
+    type: string
+  ContrailImageTag:
+    default: 'latest'
+    description: Contrail container image tag
+    type: string
+  DockerContrailVrouterKernelInitImageName:
+    description: image
+    type: string
+    default: "contrail-vrouter-kernel-init"
+  DockerContrailVrouterKernelInitDpdkImageName:
+    description: image
+    type: string
+    default: "contrail-vrouter-kernel-init-dpdk"
+  DockerContrailVrouterAgentDpdkContainerName:
+    description: image
+    type: string
+    default: "contrail-vrouter-agent-dpdk"
+  DockerContrailVrouterAgentContainerName:
+    description: image
+    type: string
+    default: "contrail-vrouter-agent"
+
+description: >
+  This template installs the Contrail dpdk packages in order
+  to bring vhost0 interface up. Vhost0 interface must be up before
+  os-net-config takes over.
+
+conditions:
+  deployment_actions_empty:
+    equals:
+      - {get_param: deployment_actions}
+      - []
+
+resources:
+  SriovHostParametersConfig:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ansible
+      inputs:
+        - name: _CONTRAIL_REGISTRY_
+        - name: _CONTRAIL_IMAGETAG_
+        - name: _CONTRAIL_VROUTER_INIT_IMAGE_
+        - name: _CONTRAIL_VROUTER_AGENT_DPDK_CONTAINER_NAME_
+        - name: _CONTRAIL_VROUTER_AGENT_CONTAINER_NAME_
+        - name: _CONTRAIL_HUGEPAGES_1GB_
+        - name: _CONTRAIL_HUGEPAGES_2MB_
+        - name: _CONTRAIL_SRIOV_MODE_
+        - name: _CONTRAIL_SRIOV_NUM_VFS_
+        - name: _IS_DPDK_
+      outputs:
+        - name: result
+      config:
+        get_file: contrail_ansible_host_config.yaml
+
+  SriovHostParametersDeployment:
+    type: OS::Heat::SoftwareDeployment
+    properties:
+      name: SriovHostParametersDeployment
+      server:  {get_param: server}
+      config: {get_resource: SriovHostParametersConfig}
+      actions:
+        if:
+          - deployment_actions_empty
+          - []
+          - ['CREATE'] # Only do this on CREATE
+      input_values:
+        _CONTRAIL_REGISTRY_: {get_param: ContrailRegistry}
+        _CONTRAIL_IMAGETAG_: {get_param: ContrailImageTag}
+        _CONTRAIL_VROUTER_INIT_IMAGE_: {if: [{equals: [{get_param: ContrailSriovMode}, 'vrouter']}, {get_param: DockerContrailVrouterKernelInitImageName}, {get_param: DockerContrailVrouterKernelInitDpdkImageName}]}
+        _CONTRAIL_VROUTER_AGENT_DPDK_CONTAINER_NAME_: {get_param: DockerContrailVrouterAgentDpdkContainerName}
+        _CONTRAIL_VROUTER_AGENT_CONTAINER_NAME_: {get_param: DockerContrailVrouterAgentContainerName}
+        _CONTRAIL_HUGEPAGES_1GB_: {get_param: ContrailSriovHugepages1GB}
+        _CONTRAIL_HUGEPAGES_2MB_: {get_param: ContrailSriovHugepages2MB}
+        _CONTRAIL_SRIOV_MODE_: {get_param: ContrailSriovMode}
+        _CONTRAIL_SRIOV_NUM_VFS_: {get_param: ContrailSriovNumVFs}
+        _IS_DPDK_: {if:[{equals: [{get_param: ContrailSriovMode}, 'vrouter']}, '', 'True']}
+
+  SriovKernelParametersConfig:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ansible
+      inputs:
+        - name: _CONTRAIL_DPDK_DRIVER_
+        - name: _CONTRAIL_SRIOV_NUM_VFS_
+        - name: _CONTRAIL_HUGEPAGES_2MB_
+        - name: _CONTRAIL_HUGEPAGES_1GB_
+      outputs:
+        - name: result
+      config:
+        get_file: contrail_ansible_kernel_config.yaml
+
+  SriovKernelParametersDeployment:
+    type: OS::Heat::SoftwareDeployment
+    depends_on: [SriovHostParametersDeployment]
+    properties:
+      name: SriovKernelParametersDeployment
+      server:  {get_param: server}
+      config: {get_resource: SriovKernelParametersConfig}
+      actions:
+        if:
+          - deployment_actions_empty
+          - []
+          - ['CREATE'] # Only do this on CREATE
+      input_values:
+        _CONTRAIL_DPDK_DRIVER_: {get_param: ContrailDpdkDriver}
+        _CONTRAIL_SRIOV_NUM_VFS_: {get_param: ContrailSriovNumVFs}
+        _CONTRAIL_HUGEPAGES_2MB_: {get_param: ContrailSriovHugepages2MB}
+        _CONTRAIL_HUGEPAGES_1GB_: {get_param: ContrailSriovHugepages1GB}
+
+  RebootConfig:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: script
+      config: |
+        #!/bin/bash
+        # Stop os-collect-config to avoid any race collecting another
+        # deployment before reboot happens
+        systemctl stop os-collect-config.service
+        /sbin/reboot
+
+  RebootDeployment:
+    type: OS::Heat::SoftwareDeployment
+    depends_on: [SriovKernelParametersDeployment]
+    properties:
+      name: RebootDeployment
+      server:  {get_param: server}
+      config: {get_resource: RebootConfig}
+      actions:
+        if:
+          - deployment_actions_empty
+          - []
+          - ['CREATE'] # Only do this on CREATE
+      signal_transport: NO_SIGNAL
+
+  RebootEnsureConfig:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: script
+      config: |
+        #!/bin/bash
+        echo "Reboot completed"
+
+  RebootEnsureDeployment:
+    type: OS::Heat::SoftwareDeployment
+    depends_on: RebootDeployment
+    properties:
+      name: RebootEnsureDeployment
+      server:  {get_param: server}
+      config: {get_resource: RebootEnsureConfig}
+      actions:
+        if:
+          - deployment_actions_empty
+          - []
+          - ['CREATE'] # Only do this on CREATE
+
+outputs:
+  result:
+    value:
+      get_attr: [SriovKernelParametersDeployment, result]
+  stdout:
+    value:
+      get_attr: [SriovKernelParametersDeployment, deploy_stdout]
+  stderr:
+    value:
+      get_attr: [SriovKernelParametersDeployment, deploy_stderr]
+  status_code:
+    value:
+      get_attr: [SriovKernelParametersDeployment, deploy_status_code]

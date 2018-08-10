@@ -1,9 +1,0 @@
-parameter_defaults:
-  NovaImage: overcloud-full-compute
-  controllerImage: overcloud-full
-  NtpServer: 10.84.5.100
-  OvercloudControlFlavor: control
-  OvercloudComputeFlavor: compute
-  ControllerCount: 1
-  ComputeCount: 1
-  DnsServers: ["8.8.8.8","8.8.4.4"]

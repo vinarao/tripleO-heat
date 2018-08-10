@@ -1,9 +1,13 @@
-heat_template_version: 2016-04-08
+heat_template_version: queens
 
 description: >
   Openstack Manila Cephfs backend
 
 parameters:
+  ServiceData:
+    default: {}
+    description: Dictionary packing service data
+    type: json
   ServiceNetMap:
     default: {}
     description: Mapping of service_name -> network name. Typically set
@@ -13,36 +17,55 @@ parameters:
   DefaultPasswords:
     default: {}
     type: json
+  RoleName:
+    default: ''
+    description: Role name on which the service is applied
+    type: string
+  RoleParameters:
+    default: {}
+    description: Parameters specific to the role
+    type: json
   EndpointMap:
     default: {}
     description: Mapping of service endpoint -> protocol. Typically set
                  via parameter_defaults in the resource registry.
     type: json
-  # CephFS Native backend params:
-  ManilaCephFSNativeEnableBackend:
-    type: boolean
-    default: false
-  ManilaCephFSNativeBackendName:
+  CephClusterName:
     type: string
-    default: cephfsnative
-  ManilaCephFSNativeDriverHandlesShareServers:
+    default: ceph
+    description: The Ceph cluster name.
+    constraints:
+    - allowed_pattern: "[a-zA-Z0-9]+"
+      description: >
+        The Ceph cluster name must be at least 1 character and contain only
+        letters and numbers.
+  # CephFS backend params:
+  ManilaCephFSBackendName:
+    type: string
+    default: cephfs
+  ManilaCephFSDriverHandlesShareServers:
     type: boolean
     default: false
-  ManilaCephFSNativeShareBackendName:
+  ManilaCephFSShareBackendName:
     type: string
     default: 'cephfs'
-  ManilaCephFSNativeCephFSConfPath:
-    type: string
-    default: '/etc/ceph/ceph.conf'
-  ManilaCephFSNativeCephFSAuthId:
+  ManilaCephFSCephFSAuthId:
     type: string
     default: 'manila'
-  ManilaCephFSNativeCephFSClusterName:
-    type: string
-    default: 'ceph'
-  ManilaCephFSNativeCephFSEnableSnapshots:
+  ManilaCephFSCephFSEnableSnapshots:
     type: boolean
-    default: true
+    default: false
+  ManilaCephFSCephFSProtocolHelperType:
+    default: CEPHFS
+    type: string
+  # (jprovazn) default value is set to assure this templates works with an
+  # external ceph too (user/key is created only when ceph is deployed by
+  # TripleO)
+  CephManilaClientKey:
+    default: ''
+    description: The Ceph client key. Can be created with ceph-authtool --gen-print-key.
+    type: string
+    hidden: true
 
 outputs:
   role_data:
@@ -50,12 +73,18 @@ outputs:
     value:
       service_name: manila_backend_cephfs
       config_settings:
-        manila::backend::cephfsnative::enable_backend: {get_param: ManilaCephFSNativeEnableBackend}
-        manila::backend::cephfsnative::title: {get_param: ManilaCephFSNativeBackendName}
-        manila::backend::cephfsnative::driver_handles_share_servers: {get_param: ManilaCephFSNativeDriverHandlesShareServers}
-        manila::backend::cephfsnative::share_backend_name: {get_param: ManilaCephFSNativeShareBackendName}
-        manila::backend::cephfsnative::cephfs_conf_path: {get_param: ManilaCephFSNativeCephFSConfPath}
-        manila::backend::cephfsnative::cephfs_auth_id: {get_param: ManilaCephFSNativeCephFSAuthId}
-        manila::backend::cephfsnative::cephfs_cluster_name: {get_param: ManilaCephFSNativeCephFSClusterName}
-        manila::backend::cephfsnative::cephfs_enable_snapshots: {get_param: ManilaCephFSNativeCephFSEnableSnapshots}
+        manila::backend::cephfs::title: {get_param: ManilaCephFSBackendName}
+        manila::backend::cephfs::driver_handles_share_servers: {get_param: ManilaCephFSDriverHandlesShareServers}
+        manila::backend::cephfs::share_backend_name: {get_param: ManilaCephFSShareBackendName}
+        manila::backend::cephfs::cephfs_conf_path:
+          list_join:
+          - ''
+          - - /etc/ceph/
+            - {get_param: CephClusterName}
+            - .conf
+        manila::backend::cephfs::cephfs_auth_id: {get_param: ManilaCephFSCephFSAuthId}
+        manila::backend::cephfs::cephfs_cluster_name: {get_param: CephClusterName}
+        manila::backend::cephfs::cephfs_enable_snapshots: {get_param: ManilaCephFSCephFSEnableSnapshots}
+        manila::backend::cephfs::ceph_client_key: {get_param: CephManilaClientKey}
+        manila::backend::cephfs::cephfs_protocol_helper_type: {get_param: ManilaCephFSCephFSProtocolHelperType}
       step_config:

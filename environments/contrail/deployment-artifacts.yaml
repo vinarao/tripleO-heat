@@ -1,8 +1,0 @@
-# Heat environment to deploy artifacts via Swift Temp URL(s)
-parameter_defaults:
-  DeployArtifactURLs:
-    - 'http://192.0.2.1:8080/v1/AUTH_0d139f6d39564fe48009210a097d6862/overcloud-artifacts/hello.tgz?temp_url_sig=6e876d9d790dfcbe1de5af3396c4f5babe655d2d&temp_url_expires=1512141437'
-    - 'http://192.0.2.1:8080/v1/AUTH_0d139f6d39564fe48009210a097d6862/overcloud-artifacts/puppet-modules.tgz?temp_url_sig=923fc44605849dc8a85d3753426156c8e12497df&temp_url_expires=1512141443'
-    - 'http://192.0.2.1:8080/v1/AUTH_0d139f6d39564fe48009210a097d6862/overcloud-artifacts/contrail-repo.tgz?temp_url_sig=2ebcb69dd8bde4103be9a7a65df01ec2e4e30b63&temp_url_expires=1512141449'
-    - 'http://192.0.2.1/contrail/puppet-modules.tgz'
-    - 'http://192.0.2.1/contrail/contrail-repo.tgz'

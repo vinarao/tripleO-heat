@@ -1,4 +1,4 @@
-heat_template_version: 2014-10-16
+heat_template_version: queens
 description: 'Pre-Puppet Config for Pacemaker deployments'
 
 parameters:
@@ -20,6 +20,7 @@ resources:
   ControllerPrePuppetMaintenanceModeDeployment:
     type: OS::Heat::SoftwareDeployments
     properties:
-      servers:  {get_param: servers}
+      name: ControllerPrePuppetMaintenanceModeDeployment
+      servers: {get_param: servers}
       config: {get_resource: ControllerPrePuppetMaintenanceModeConfig}
       input_values: {get_param: input_values}

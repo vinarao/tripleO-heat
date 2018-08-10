@@ -1,4 +1,4 @@
-heat_template_version: 2015-04-30
+heat_template_version: queens
 
 description: >
   Software Config to drive os-net-config for a simple bridge configured
@@ -15,7 +15,7 @@ parameters:
     type: string
   InternalApiIpSubnet:
     default: ''
-    description: IP address/subnet on the internal API network
+    description: IP address/subnet on the internal_api network
     type: string
   StorageIpSubnet:
     default: ''
@@ -23,7 +23,11 @@ parameters:
     type: string
   StorageMgmtIpSubnet:
     default: ''
-    description: IP address/subnet on the storage mgmt network
+    description: IP address/subnet on the storage_mgmt network
+    type: string
+  StorageNFSIpSubnet:
+    default: ''
+    description: IP address/subnet on the storage_nfs network
     type: string
   TenantIpSubnet:
     default: ''
@@ -47,7 +51,9 @@ resources:
         str_replace:
           template: |
             #!/bin/bash
-            ip addr add CONTROLPLANEIP/CONTROLPLANESUBNETCIDR dev $bridge_name
+            if ! ip addr show dev $bridge_name | grep CONTROLPLANEIP/CONTROLPLANESUBNETCIDR; then
+                ip addr add CONTROLPLANEIP/CONTROLPLANESUBNETCIDR dev $bridge_name
+            fi
           params:
             CONTROLPLANEIP: {get_param: ControlPlaneIp}
             CONTROLPLANESUBNETCIDR: {get_param: ControlPlaneSubnetCidr}

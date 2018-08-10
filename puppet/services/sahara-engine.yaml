@@ -1,9 +1,13 @@
-heat_template_version: 2016-04-08
+heat_template_version: queens
 
 description: >
   OpenStack Sahara Engine service configured with Puppet
 
 parameters:
+  ServiceData:
+    default: {}
+    description: Dictionary packing service data
+    type: json
   ServiceNetMap:
     default: {}
     description: Mapping of service_name -> network name. Typically set
@@ -12,6 +16,14 @@ parameters:
     type: json
   DefaultPasswords:
     default: {}
+    type: json
+  RoleName:
+    default: ''
+    description: Role name on which the service is applied
+    type: string
+  RoleParameters:
+    default: {}
+    description: Parameters specific to the role
     type: json
   EndpointMap:
     default: {}
@@ -31,9 +43,12 @@ resources:
   SaharaBase:
     type: ./sahara-base.yaml
     properties:
+      ServiceData: {get_param: ServiceData}
       ServiceNetMap: {get_param: ServiceNetMap}
       DefaultPasswords: {get_param: DefaultPasswords}
       EndpointMap: {get_param: EndpointMap}
+      RoleName: {get_param: RoleName}
+      RoleParameters: {get_param: RoleParameters}
 
 outputs:
   role_data:
@@ -41,11 +56,18 @@ outputs:
     value:
       service_name: sahara_engine
       monitoring_subscription: {get_param: MonitoringSubscriptionSaharaEngine}
-      logging_source: {get_param: SaharaEngineLoggingSource}
-      logging_groups:
-        - sahara
       config_settings:
         map_merge:
           - get_attr: [SaharaBase, role_data, config_settings]
+      service_config_settings:
+        fluentd:
+          tripleo_fluentd_groups_sahara_engine:
+            - sahara
+          tripleo_fluentd_sources_sahara_engine:
+            - {get_param: SaharaEngineLoggingSource}
       step_config: |
         include ::tripleo::profile::base::sahara::engine
+      upgrade_tasks:
+        - name: Stop sahara_engine service
+          when: step|int == 1
+          service: name=openstack-sahara-engine state=stopped

@@ -1,64 +1,46 @@
-resource_registry:
-  OS::TripleO::Services::NeutronDhcpAgent: OS::Heat::None
-  OS::TripleO::Services::NeutronL3Agent: OS::Heat::None
-  OS::TripleO::Services::NeutronMetadataAgent: OS::Heat::None
-  OS::TripleO::Services::NeutronOvsAgent: OS::Heat::None
-  OS::TripleO::Services::ComputeNeutronOvsAgent: OS::Heat::None
-  OS::TripleO::Services::NeutronCorePlugin: OS::TripleO::Services::NeutronCorePluginContrail
-  OS::TripleO::Services::ComputeNeutronCorePlugin: OS::TripleO::Services::ComputeNeutronCorePluginContrail
-  OS::TripleO::Services::ContrailHeat: ../../puppet/services/network/contrail-heat.yaml
-  OS::TripleO::Services::ContrailAnalytics: ../../puppet/services/network/contrail-analytics.yaml
-  OS::TripleO::Services::ContrailAnalyticsDatabase: ../../puppet/services/network/contrail-analytics-database.yaml
-  OS::TripleO::Services::ContrailConfig: ../../puppet/services/network/contrail-config.yaml
-  OS::TripleO::Services::ContrailControl: ../../puppet/services/network/contrail-control.yaml
-  OS::TripleO::Services::ContrailDatabase: ../../puppet/services/network/contrail-database.yaml
-  OS::TripleO::Services::ContrailWebUI: ../../puppet/services/network/contrail-webui.yaml
-  OS::TripleO::Services::ContrailTsn: ../../puppet/services/network/contrail-tsn.yaml
-  OS::TripleO::Services::ContrailDpdk: ../../puppet/services/network/contrail-dpdk.yaml
-  OS::TripleO::Services::ComputeNeutronCorePluginContrail: ../../puppet/services/network/contrail-vrouter.yaml
-  OS::TripleO::Services::NeutronCorePluginContrail: ../../puppet/services/network/contrail-neutron-plugin.yaml
-  OS::TripleO::NodeUserData: install_vrouter_kmod.yaml
 parameter_defaults:
   ServiceNetMap:
-    ContrailAnalyticsNetwork: internal_api
+    ContrailDatabaseNetwork: internal_api
     ContrailAnalyticsDatabaseNetwork: internal_api
     ContrailConfigNetwork: internal_api
-    ContrailControlNetwork: internal_api
-    ContrailDatabaseNetwork: internal_api
+    ContrailAnalyticsNetwork: internal_api
+    ContrailControlNetwork: tenant
     ContrailWebuiNetwork: internal_api
-    ContrailTsnNetwork: internal_api
-    ContrailVrouterNetwork: internal_api
-    ContrailDpdkNetwork: internal_api
-  ContrailDpdkImage: overcloud-full-dpdk
-  ContrailVersion: 3
-  ContrailRepo: http://192.0.2.1/contrail
-  ContrailControlManageNamed: true
-  EnablePackageInstall: true
-  ContrailConfigIfmapUserName: api-server
-  ContrailConfigIfmapUserPassword: api-server
-  OvercloudControlFlavor: control
+    ContrailVrouterNetwork: tenant
+  OvercloudControllerFlavor: control
   OvercloudContrailControllerFlavor: contrail-controller
-  OvercloudContrailAnalyticsFlavor: contrail-analytics
-  OvercloudContrailAnalyticsDatabaseFlavor: contrail-analytics-database
-  OvercloudContrailTsnFlavor: contrail-tsn
   OvercloudComputeFlavor: compute
   OvercloudContrailDpdkFlavor: compute-dpdk
-  ControllerCount: 3 
-  ContrailControllerCount: 3
-  ContrailAnalyticsCount: 3
-  ContrailAnalyticsDatabaseCount: 3
-  ContrailTsnCount: 0
+  OvercloudContrailSriovFlavor: compute-sriov
+  ControllerCount: 1 
+  ContrailControllerCount: 1
   ComputeCount: 1
   ContrailDpdkCount: 0
-  DnsServers: ["172.21.200.60"]
-  NtpServer: 10.0.0.1
-  NeutronCorePlugin: neutron_plugin_contrail.plugins.opencontrail.contrail_plugin.NeutronPluginContrailCoreV2
-  NeutronServicePlugins: 'neutron_plugin_contrail.plugins.opencontrail.loadbalancer.v2.plugin.LoadBalancerPluginV2'
-  NeutronTunnelTypes: ''
+  ContrailSriovCount: 0
   NeutronMetadataProxySharedSecret: secret
-  ContrailControlRNDCSecret: sHE1SM8nsySdgsoRxwARtA==
-  ContrailAnalyticsDBMinDiskGB: 32
-  ContrailConfigDBMinDiskGB: 32
-  NovaComputeExtraConfig:
-    # Required for Centos 7.3 and Qemu 2.6.0
-    nova::compute::libvirt::libvirt_cpu_mode: 'none'
+# enable insecure registry
+  ContrailRegistryInsecure: true
+  DockerInsecureRegistryAddress: 192.168.24.1:8787
+  ContrailRegistry: 192.168.24.1:8787
+# enable private secure registry
+#  ContrailRegistryCertUrl: http://satellite.englab.juniper.net/pub/satellite.englab.juniper.net.crt
+#  ContrailRegistry: 192.168.24.1:8787
+# set contrail image tag
+#  ContrailImageTag: queens-master-145-rhel-queens
+  ContrailImageTag: rhel-queens-5.0-161
+# enable 1 GB hugepages
+#  ContrailDpdkHugepages1GB: 10
+#  ContrailVrouterHugepages1GB: 10
+# contrail container configuration settings
+  ContrailSettings:
+    VROUTER_GATEWAY: 10.0.0.1
+  ContrailConfigDBMinDiskGB: 40
+  ContrailAnalyticsDBMinDiskGB: 40
+#    KEY1: value1
+#    KEY2: value2
+# SRIOV settings
+#  NovaPCIPassthrough:
+#    - devname: "ens2f1"
+#      physical_network: "sriov1"
+#  ContrailSriovNumVFs: ["ens2f1:7"]
+#  ContrailSriovHugepages1GB: 20

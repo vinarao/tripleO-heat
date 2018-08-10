@@ -1,9 +1,13 @@
-heat_template_version: 2016-04-08
+heat_template_version: queens
 
 description: >
   Ceph Monitor service.
 
 parameters:
+  ServiceData:
+    default: {}
+    description: Dictionary packing service data
+    type: json
   ServiceNetMap:
     default: {}
     description: Mapping of service_name -> network name. Typically set
@@ -12,6 +16,14 @@ parameters:
     type: json
   DefaultPasswords:
     default: {}
+    type: json
+  RoleName:
+    default: ''
+    description: Role name on which the service is applied
+    type: string
+  RoleParameters:
+    default: {}
+    description: Parameters specific to the role
     type: json
   EndpointMap:
     default: {}
@@ -27,6 +39,20 @@ parameters:
     hidden: true
   CinderRbdPoolName:
     default: volumes
+    type: string
+  CinderRbdExtraPools:
+    default: []
+    description: >
+      List of extra Ceph pools for use with RBD backends for Cinder. An
+      extra Cinder RBD backend driver is created for each pool in the
+      list. This is in addition to the standard RBD backend driver
+      associated with the CinderRbdPoolName.
+    type: comma_delimited_list
+  ManilaCephFSDataPoolName:
+    default: manila_data
+    type: string
+  ManilaCephFSMetadataPoolName:
+    default: manila_metadata
     type: string
   CinderBackupRbdPoolName:
     default: backups
@@ -53,17 +79,32 @@ parameters:
       }
     default: {}
     type: json
+  CephValidationRetries:
+    type: number
+    default: 40
+    description: Number of retry attempts for Ceph validation
+  CephValidationDelay:
+    type: number
+    default: 30
+    description: Interval (in seconds) in between validation checks
   MonitoringSubscriptionCephMon:
     default: 'overcloud-ceph-mon'
     type: string
+  CephPoolDefaultSize:
+    description: default minimum replication for RBD copies
+    type: number
+    default: 3
 
 resources:
   CephBase:
     type: ./ceph-base.yaml
     properties:
+      ServiceData: {get_param: ServiceData}
       ServiceNetMap: {get_param: ServiceNetMap}
       DefaultPasswords: {get_param: DefaultPasswords}
       EndpointMap: {get_param: EndpointMap}
+      RoleName: {get_param: RoleName}
+      RoleParameters: {get_param: RoleParameters}
 
 outputs:
   role_data:
@@ -76,9 +117,9 @@ outputs:
           - get_attr: [CephBase, role_data, config_settings]
           - ceph::profile::params::ms_bind_ipv6: {get_param: CephIPv6}
             ceph::profile::params::mon_key: {get_param: CephMonKey}
-            ceph::profile::params::osd_pool_default_pg_num: 32
-            ceph::profile::params::osd_pool_default_pgp_num: 32
-            ceph::profile::params::osd_pool_default_size: 3
+            ceph::profile::params::osd_pool_default_pg_num: 128
+            ceph::profile::params::osd_pool_default_pgp_num: 128
+            ceph::profile::params::osd_pool_default_size: {get_param: CephPoolDefaultSize}
             # repeat returns items in a list, so we need to map_merge twice
             tripleo::profile::base::ceph::mon::ceph_pools:
               map_merge:
@@ -86,11 +127,16 @@ outputs:
                     repeat:
                       for_each:
                         <%pool%>:
-                          - {get_param: CinderRbdPoolName}
-                          - {get_param: CinderBackupRbdPoolName}
-                          - {get_param: NovaRbdPoolName}
-                          - {get_param: GlanceRbdPoolName}
-                          - {get_param: GnocchiRbdPoolName}
+                          list_concat:
+                            - - {get_param: CinderRbdPoolName}
+                              - {get_param: ManilaCephFSDataPoolName}
+                              - {get_param: ManilaCephFSMetadataPoolName}
+                              - {get_param: CinderBackupRbdPoolName}
+                              - {get_param: NovaRbdPoolName}
+                              - {get_param: GlanceRbdPoolName}
+                              - {get_param: GnocchiRbdPoolName}
+                            # CinderRbdExtraPools is a list (do not indent further)
+                            - {get_param: CinderRbdExtraPools}
                       template:
                         <%pool%>:
                           pg_num: "%{hiera('ceph::profile::params::osd_pool_default_pg_num')}"
@@ -105,3 +151,37 @@ outputs:
         get_attr: [CephBase, role_data, service_config_settings]
       step_config: |
         include ::tripleo::profile::base::ceph::mon
+      upgrade_batch_tasks:
+        # NOTE: upgrade_batch_tasks are deprecated in Queens.
+        # Note we perform these tasks in list order, but they are all step0 so
+        # we can perform a rolling upgrade of all mon nodes in step0, then a
+        # rolling upgrade of all osd nodes in step1
+        - when: step|int == 0
+          block:
+            - name: Check status
+              tags: validation
+              shell: ceph health | egrep -sq "HEALTH_OK|HEALTH_WARN"
+            - name: Stop CephMon
+              service:
+                name: ceph-mon@{{ ansible_hostname }}
+                state: stopped
+            - name: Update Ceph packages
+              yum:
+                name: ceph-mon
+                state: latest
+            - name: Start CephMon
+              service:
+                name: ceph-mon@{{ ansible_hostname }}
+                state: started
+            # ceph-ansible
+            # https://github.com/ceph/ceph-ansible/blob/master/infrastructure-playbooks/rolling_update.yml#L149-L157
+            - name: Wait for the monitor to join the quorum...
+              tags: ceph_quorum_validation
+              shell: |
+                ceph -s | grep monmap | sed 's/.*quorum//' | egrep -sq {{ ansible_hostname }}
+              register: ceph_quorum_nodecheck
+              until: ceph_quorum_nodecheck.rc == 0
+              retries: {get_param: CephValidationRetries}
+              delay: {get_param: CephValidationDelay}
+            - name: ceph osd crush tunables default
+              shell: ceph osd crush tunables default

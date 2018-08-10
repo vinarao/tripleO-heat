@@ -1,0 +1,320 @@
+heat_template_version: queens
+
+description: >
+  Contrail containerized Config Config service
+
+parameters:
+  ContrailConfigDBMinDiskGB:
+    description:  The min size for Contrail Config DB.
+                  It is to check the size of the node.
+                  Contrail will fail installation if disk size is not enough.
+    type: string
+    default: ''
+  DockerContrailConfigApiImageName:
+    description: image
+    type: string
+    default: "contrail-controller-config-api"
+  DockerContrailConfigSchemaImageName:
+    description: image
+    type: string
+    default: "contrail-controller-config-schema"
+  DockerContrailConfigSvcmonitorImageName:
+    description: image
+    type: string
+    default: "contrail-controller-config-svcmonitor"
+  DockerContrailConfigDevicemgrImageName:
+    description: image
+    type: string
+    default: "contrail-controller-config-devicemgr"
+  EndpointMap:
+    default: {}
+    description: Mapping of service endpoint -> protocol. Typically set
+                 via parameter_defaults in the resource registry.
+    type: json
+  ServiceData:
+    default: {}
+    description: Dictionary packing service data
+    type: json
+  ServiceNetMap:
+    default: {}
+    description: Mapping of service_name -> network name. Typically set
+                 via parameter_defaults in the resource registry.  This
+                 mapping overrides those in ServiceNetMapDefaults.
+    type: json
+  DefaultPasswords:
+    default: {}
+    type: json
+  RoleName:
+    default: ''
+    description: Role name on which the service is applied
+    type: string
+  RoleParameters:
+    default: {}
+    description: Parameters specific to the role
+    type: json
+  EnableInternalTLS:
+    type: boolean
+    default: false
+  InternalTLSCAFile:
+    default: '/etc/ipa/ca.crt'
+    type: string
+    description: Specifies the default CA cert to use if TLS is used for
+                 services in the internal network.
+  InternalTLSCRLPEMFile:
+    default: '/etc/pki/CA/crl/overcloud-crl.pem'
+    type: string
+    description: Specifies the default CRL PEM file to use for revocation if
+                 TLS is used for services in the internal network.
+
+conditions:
+  contrail_configdb_min_disk_gb_unset: {equals : [{get_param: ContrailConfigDBMinDiskGB}, '']}
+  internal_tls_enabled: {equals: [{get_param: EnableInternalTLS}, true]}
+
+resources:
+  ContrailBase:
+    type: contrail-base.yaml
+    properties:
+      EndpointMap: {get_param: EndpointMap}
+      ServiceData: {get_param: ServiceData}
+      ServiceNetMap: {get_param: ServiceNetMap}
+      DefaultPasswords: {get_param: DefaultPasswords}
+      RoleName: {get_param: RoleName}
+      RoleParameters: {get_param: RoleParameters}
+
+outputs:
+  role_data:
+    description: Role data for the Contrail Config service.
+    value:
+      service_name: contrail_config
+      config_settings:
+        map_merge:
+          - get_attr: [ContrailBase, role_data, config_settings]
+      service_config_settings:
+        haproxy:
+          tripleo.contrail_config.haproxy_endpoints:
+            contrail_config:
+              public_virtual_ip: "%{hiera('contrail_config_vip')}"
+              internal_ip: "%{hiera('contrail_config_vip')}"
+              service_port: 8082
+              mode: 'http'
+              listen_options:
+                balance:
+                  - 'source'
+              public_ssl_port: 18082
+              service_network: {get_param: [ServiceNetMap, ContrailConfigNetwork]}
+              member_options:
+                list_concat:
+                  - [ 'check', 'inter 2000', 'rise 2', 'fall 5' ]
+                  - if:
+                      - internal_tls_enabled
+                      - - 'ssl'
+                        - 'verify required'
+                        - list_join:
+                          - ' '
+                          - - 'ca-file'
+                            - {get_param: InternalTLSCAFile}
+                        - list_join:
+                          - ' '
+                          - - 'crl-file'
+                            - {get_param: InternalTLSCRLPEMFile}
+                      - null
+      docker_config:
+        step_2:
+          get_attr: [ContrailBase, role_data, docker_config, step_2]
+        step_5:
+          contrail_config_nodemgr:
+            image: {get_attr: [ContrailBase, role_data, contrail_nodemgr_image_name]}
+            environment:
+              list_concat:
+                - if:
+                  - contrail_configdb_min_disk_gb_unset
+                  - []
+                  - - list_join:
+                      - ''
+                      - - 'CONFIG_NODEMGR__DEFAULTS__minimum_diskGB='
+                        - {get_param: ContrailConfigDBMinDiskGB}
+                - - NODE_TYPE=config
+                  - CASSANDRA_CQL_PORT=9041
+                  - CASSANDRA_JMX_LOCAL_PORT=7201
+            net: host
+            detach: true
+            user: root
+            restart: always
+            volumes:
+              list_concat:
+                - {get_attr: [ContrailBase, role_data, contrail_base_volumes]}
+                - - /var/run/docker.sock:/var/run/docker.sock
+            env_file:
+              - /etc/contrail/common_config.env
+          contrail_config_api:
+            image: &contrail_config_api_image
+              list_join:
+                - ''
+                - - {get_attr: [ContrailBase, role_data, contrail_registry]}
+                  - '/'
+                  - {get_param: DockerContrailConfigApiImageName}
+                  - ':'
+                  - {get_attr: [ContrailBase, role_data, contrail_imagetag]}
+            net: host
+            privileged: false
+            detach: true
+            user: root
+            restart: always
+            volumes:
+              get_attr: [ContrailBase, role_data, contrail_base_volumes]
+            env_file:
+              - /etc/contrail/common_config.env
+          contrail_config_schema:
+            image: &contrail_config_schema_image
+              list_join:
+                - ''
+                - - {get_attr: [ContrailBase, role_data, contrail_registry]}
+                  - '/'
+                  - {get_param: DockerContrailConfigSchemaImageName}
+                  - ':'
+                  - {get_attr: [ContrailBase, role_data, contrail_imagetag]}
+            net: host
+            privileged: false
+            detach: true
+            user: root
+            restart: always
+            volumes:
+              get_attr: [ContrailBase, role_data, contrail_base_volumes]
+            env_file:
+              - /etc/contrail/common_config.env
+          contrail_config_svc_monitor:
+            image: &contrail_config_svc_monitor_image
+              list_join:
+                - ''
+                - - {get_attr: [ContrailBase, role_data, contrail_registry]}
+                  - '/'
+                  - {get_param: DockerContrailConfigSvcmonitorImageName}
+                  - ':'
+                  - {get_attr: [ContrailBase, role_data, contrail_imagetag]}
+            net: host
+            privileged: false
+            detach: true
+            user: root
+            restart: always
+            volumes:
+              get_attr: [ContrailBase, role_data, contrail_base_volumes]
+            env_file:
+              - /etc/contrail/common_config.env
+          contrail_config_device_manager:
+            image: &contrail_config_device_manager_image
+              list_join:
+                - ''
+                - - {get_attr: [ContrailBase, role_data, contrail_registry]}
+                  - '/'
+                  - {get_param: DockerContrailConfigDevicemgrImageName}
+                  - ':'
+                  - {get_attr: [ContrailBase, role_data, contrail_imagetag]}
+            net: host
+            privileged: false
+            detach: true
+            user: root
+            restart: always
+            volumes:
+              get_attr: [ContrailBase, role_data, contrail_base_volumes]
+            env_file:
+              - /etc/contrail/common_config.env
+      host_prep_tasks:
+        - name: create contrail directories
+          file:
+            path: "{{ item }}"
+            state: directory
+            recurse: yes
+          with_items:
+            - /var/log/containers/contrail
+            - /etc/contrail/ssl
+        - name: register /etc/contrail/common_config.env
+          stat:
+            path: /etc/contrail/common_config.env
+          register: p
+        - name: create /etc/contrail/common_config.env
+          copy:
+            dest: /etc/contrail/common_config.env
+            content: ""
+          when: not p.stat.exists
+        - name: get service_config
+          set_fact:
+            service_configs: "{{ lookup('file', '/etc/puppet/hieradata/service_configs.json') | from_json }}"
+        - name: get contrail_settings
+          set_fact:
+            contrail_settings: "{{ service_configs.contrail_settings }}"
+          when: service_configs is defined
+        - name: write contrail settings to file
+          lineinfile: dest=/etc/contrail/common_config.env regexp="^{{ item.key }}.*" line="{{ item.key }}={{ item.value }}" state=present
+          with_dict: "{{ contrail_settings }}"
+          when: contrail_settings is defined
+        - name: get keystone admin api vip
+          shell: hiera -c /etc/puppet/hiera.yaml keystone_admin_api_vip
+          register: keystone_admin_api_vip
+        - name: get keystone public api vip
+          shell: hiera -c /etc/puppet/hiera.yaml keystone_public_api_vip
+          register: keystone_public_api_vip
+        - name: get keystone admin password
+          shell: hiera -c /etc/puppet/hiera.yaml contrail::admin_password
+          register: keystone_admin_password
+        - name: get keystone admin user
+          shell: hiera -c /etc/puppet/hiera.yaml contrail::admin_user
+          register: keystone_admin_user
+        - name: get keystone admin tenant
+          shell: hiera -c /etc/puppet/hiera.yaml contrail::admin_tenant_name
+          register: keystone_admin_tenant
+        - name: get nova api vip
+          shell: hiera -c /etc/puppet/hiera.yaml nova_api_vip
+          register: nova_api_vip
+        - name: get contrail config database node ips
+          shell: hiera -c /etc/puppet/hiera.yaml contrail_database_node_ips
+          register: contrail_config_database_node_ips_list
+        - name: turn contrail config db ips into json
+          set_fact:
+            contrail_config_database_node_ips_json: "{{ contrail_config_database_node_ips_list.stdout | from_json }}"
+        - name: turn json into comma separated string
+          set_fact:
+            contrail_config_database_node_ips_string: "{{ contrail_config_database_node_ips_json | join(',') }}"
+        - name: get contrail config node ips
+          shell: hiera -c /etc/puppet/hiera.yaml contrail_config_node_ips
+          register: contrail_config_node_ips_list
+        - name: turn contrail config ips into json
+          set_fact:
+            contrail_config_node_ips_json: "{{ contrail_config_node_ips_list.stdout | from_json }}"
+        - name: turn json into comma separated string
+          set_fact:
+            contrail_config_node_ips_string: "{{ contrail_config_node_ips_json | join(',') }}"
+        - name: get contrail analytics node ips
+          shell: hiera -c /etc/puppet/hiera.yaml contrail_analytics_node_ips
+          register: contrail_analytics_node_ips_list
+        - name: turn contrail analytics ips into json
+          set_fact:
+            contrail_analytics_node_ips_json: "{{ contrail_analytics_node_ips_list.stdout | from_json }}"
+        - name: turn json into comma separated string
+          set_fact:
+            contrail_analytics_node_ips_string: "{{ contrail_analytics_node_ips_json | join(',') }}"
+        - name: write contrail config node ips to environment file
+          lineinfile: dest=/etc/contrail/common_config.env regexp='^CONFIG_NODES.*' line="CONFIG_NODES={{ contrail_config_node_ips_string }}" state=present
+        - name: write contrail config db node ips to environment file
+          lineinfile: dest=/etc/contrail/common_config.env regexp='^CONFIGDB_NODES.*' line="CONFIGDB_NODES={{ contrail_config_database_node_ips_string }}" state=present
+        - name: write contrail config db node ips to environment file
+          lineinfile: dest=/etc/contrail/common_config.env regexp='^ZOOKEEPER_NODES.*' line="ZOOKEEPER_NODES={{ contrail_config_database_node_ips_string }}" state=present
+        - name: write contrail config rmq node ips to environment file
+          lineinfile: dest=/etc/contrail/common_config.env regexp='^RABBITMQ_NODES.*' line="RABBITMQ_NODES={{ contrail_config_database_node_ips_string }}" state=present
+        - name: write contrail analytics node ips to environment file
+          lineinfile: dest=/etc/contrail/common_config.env regexp='^ANALYTICS_NODES.*' line="ANALYTICS_NODES={{ contrail_analytics_node_ips_string }}" state=present
+        - name: write remaining contrail config env cars
+          lineinfile: dest=/etc/contrail/common_config.env line="{{ item }}" state=present
+          with_items:
+            - RABBITMQ_NODE_PORT=5673
+            - OPENSTACK_VERSION=queens
+            - CLOUD_ORCHESTRATOR=openstack
+            - AUTH_MODE=keystone
+            - KEYSTONE_AUTH_HOST={{ keystone_admin_api_vip.stdout }}
+            - KEYSTONE_AUTH_ADMIN_PASSWORD={{ keystone_admin_password.stdout }}
+            - KEYSTONE_AUTH_ADMIN_USER={{ keystone_admin_user.stdout }}
+            - KEYSTONE_AUTH_ADMIN_TENANT={{ keystone_admin_tenant.stdout }}
+            - KEYSTONE_AUTH_URL_VERSION=/v3
+            - IPFABRIC_SERVICE_HOST={{ nova_api_vip.stdout }}
+
+      metadata_settings:
+        get_attr: [ContrailBase, role_data, metadata_settings]

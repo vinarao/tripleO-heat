@@ -1,4 +1,4 @@
-heat_template_version: 2015-10-15
+heat_template_version: queens
 
 description: >
   Creates a port for a VIP on the undercloud ctlplane network.
@@ -9,8 +9,8 @@ parameters:
     description: Name of the service to lookup
     default: ''
     type: string
-  NetworkName:
-    description: # Here for compatibility with isolated networks
+  NetworkName: # Here for compatibility with isolated networks
+    description: Name of the network where the VIP will be created
     default: ctlplane
     type: string
   PortName:
@@ -25,6 +25,10 @@ parameters:
     description: The name of the undercloud Neutron control plane
     default: ctlplane
     type: string
+  ControlPlaneSubnet:
+    description: The name of the undercloud Neutron control plane subnet
+    default: ctlplane-subnet
+    type: string
   FixedIPs:
     description: >
         Control the IP allocation for the VIP port. E.g.
@@ -32,13 +36,23 @@ parameters:
     default: []
     type: json
 
+conditions:
+  fixed_ip_not_set:
+    equals:
+    - get_param: FixedIPs
+    - []
+
 resources:
   VipPort:
-    type: OS::Neutron::Port
+    type: OS::TripleO::Network::Ports::ControlPlaneVipPort
     properties:
       network: {get_param: ControlPlaneNetwork}
       name: {get_param: PortName}
-      fixed_ips: {get_param: FixedIPs}
+      fixed_ips:
+        if:
+        - fixed_ip_not_set
+        - [{subnet: {get_param: ControlPlaneSubnet}}]
+        - get_param: FixedIPs
       replacement_policy: AUTO
 
 outputs:

@@ -1,4 +1,4 @@
-heat_template_version: 2016-04-08
+heat_template_version: queens
 
 description: >
   SNMP client configured with Puppet, to facilitate Ceilometer Hardware
@@ -6,6 +6,10 @@ description: >
   monitoring.
 
 parameters:
+  ServiceData:
+    default: {}
+    description: Dictionary packing service data
+    type: json
   ServiceNetMap:
     default: {}
     description: Mapping of service_name -> network name. Typically set
@@ -14,6 +18,14 @@ parameters:
     type: json
   DefaultPasswords:
     default: {}
+    type: json
+  RoleName:
+    default: ''
+    description: Role name on which the service is applied
+    type: string
+  RoleParameters:
+    default: {}
+    description: Parameters specific to the role
     type: json
   EndpointMap:
     default: {}
@@ -28,6 +40,21 @@ parameters:
     description: The user password for SNMPd with readonly rights running on all Overcloud nodes
     type: string
     hidden: true
+  SnmpdBindHost:
+    description: An array of bind host addresses on which SNMP daemon will listen.
+    type: comma_delimited_list
+    default: ['udp:161','udp6:[::1]:161']
+  SnmpdOptions:
+    description: A string containing the commandline options passed to snmpd
+    type: string
+    default: '-LS0-5d'
+  SnmpdIpSubnet:
+    default: ''
+    description: IP address/subnet on the snmpd network. If empty (default), SnmpdNetwork
+                 will be taken.
+    type: string
+conditions:
+  snmpd_network_unset: {equals : [{get_param: SnmpdIpSubnet}, '']}
 
 outputs:
   role_data:
@@ -37,9 +64,25 @@ outputs:
       config_settings:
         tripleo::profile::base::snmp::snmpd_user: {get_param: SnmpdReadonlyUserName}
         tripleo::profile::base::snmp::snmpd_password: {get_param: SnmpdReadonlyUserPassword}
+        snmp::agentaddress: {get_param: SnmpdBindHost}
+        snmp::snmpd_options: {get_param: SnmpdOptions}
+        snmpd_network:
+          str_replace:
+            template: "NETWORK_subnet"
+            params:
+              NETWORK: {get_param: [ServiceNetMap, SnmpdNetwork]}
         tripleo.snmp.firewall_rules:
-          '127 snmp':
+          '124 snmp':
             dport: 161
             proto: 'udp'
+            source:
+              if:
+              - snmpd_network_unset
+              - "%{hiera('snmpd_network')}"
+              - {get_param: SnmpdIpSubnet}
       step_config: |
         include ::tripleo::profile::base::snmp
+      upgrade_tasks:
+        - name: Stop snmp service
+          when: step|int == 1
+          service: name=snmpd state=stopped

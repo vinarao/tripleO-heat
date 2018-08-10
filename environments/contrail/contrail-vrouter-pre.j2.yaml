@@ -1,6 +1,0 @@
-resource_registry:
-{% for role in roles %}
-{% if "Compute" in role.name %}
-  OS::TripleO::{{role.name}}::PreNetworkConfig: ../../extraconfig/pre_network/vrouter_module_on_compute.yaml
-{% endif %}
-{% endfor %}

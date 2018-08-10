@@ -67,11 +67,11 @@ example:
 parameter_defaults:
   ControlPlaneDefaultRoute: 192.168.122.130
   ControlPlaneSubnetCidr: "24"
-  EC2MetadataIp: "192.0.2.1"
+  EC2MetadataIp: "192.168.24.1"
 
 In this example, 192.168.122.130 is the external management IP of an
 undercloud, thus it is the default route for the configured local_ip value of
-192.0.2.1.
+192.168.24.1.
 
 
 os-collect-config
@@ -119,10 +119,15 @@ from the deployment command, the script should be ready to run:
     [NovaCompute]: CREATE_IN_PROGRESS state changed
 
 The user running the script must be able to ssh as root to each server.  Define
-the hostnames of the deployed servers you intend to use for each role type::
+the names of your custom roles (if applicable) and hostnames of the deployed
+servers you intend to use for each role type. For each role name, a
+corresponding <role-name>_hosts variable should also be defined, e.g.::
 
-    export controller_hosts="controller0 controller1 controller2"
-    export compute_hosts="compute0"
+    export ROLES="Controller NewtorkNode StorageNode Compute"
+    export Controller_hosts="10.0.0.1 10.0.0.2 10.0.0.3"
+    export NetworkNode_hosts="10.0.0.4 10.0.0.5 10.0.0.6"
+    export StorageNode_hosts="10.0.0.7 10.0.08"
+    export Compute_hosts="10.0.0.9 10.0.0.10 10.0.0.11"
 
 Then run the script on the undercloud with a stackrc file sourced, and
 the script will copy the needed os-collect-config.conf configuration to each

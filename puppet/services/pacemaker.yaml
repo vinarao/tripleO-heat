@@ -1,9 +1,13 @@
-heat_template_version: 2016-10-14
+heat_template_version: queens
 
 description: >
   Pacemaker service configured with Puppet
 
 parameters:
+  ServiceData:
+    default: {}
+    description: Dictionary packing service data
+    type: json
   ServiceNetMap:
     default: {}
     description: Mapping of service_name -> network name. Typically set
@@ -12,6 +16,14 @@ parameters:
     type: json
   DefaultPasswords:
     default: {}
+    type: json
+  RoleName:
+    default: ''
+    description: Role name on which the service is applied
+    type: string
+  RoleParameters:
+    default: {}
+    description: Parameters specific to the role
     type: json
   EndpointMap:
     default: {}
@@ -29,11 +41,20 @@ parameters:
     default: false
     description: Whether to enable fencing in Pacemaker or not.
     type: boolean
+  PacemakerRemoteAuthkey:
+    type: string
+    description: The authkey for the pacemaker remote service.
+    hidden: true
   PcsdPassword:
     type: string
     description: The password for the 'pcsd' user for pacemaker.
     hidden: true
-    default: ''
+  CorosyncSettleTries:
+    type: number
+    description: Number of tries for cluster settling. This has the
+                 same default as the pacemaker puppet module. Override
+                 to a smaller value when in need to replace a controller node.
+    default: 360
   FencingConfig:
     default: {}
     description: |
@@ -76,6 +97,10 @@ parameters:
         \[(?<pid>[^ ]*)\]
         (?<host>[^ ]*)
         (?<message>.*)$/
+  EnableLoadBalancer:
+    default: true
+    description: Whether to deploy a LoadBalancer on the Controller
+    type: boolean
 
 outputs:
   role_data:
@@ -83,15 +108,13 @@ outputs:
     value:
       service_name: pacemaker
       monitoring_subscription: {get_param: MonitoringSubscriptionPacemaker}
-      logging_groups:
-        - haclient
-      logging_source: {get_param: PacemakerLoggingSource}
       config_settings:
         pacemaker::corosync::cluster_name: 'tripleo_cluster'
         pacemaker::corosync::manage_fw: false
         pacemaker::resource_defaults::defaults:
           resource-stickiness: { value: INFINITY }
         corosync_token_timeout: 10000
+        pacemaker::corosync::settle_tries: {get_param: CorosyncSettleTries}
         tripleo.pacemaker.firewall_rules:
           '130 pacemaker tcp':
             proto: 'tcp'
@@ -112,5 +135,37 @@ outputs:
               passwords:
                 - {get_param: PcsdPassword}
                 - {get_param: [DefaultPasswords, pcsd_password]}
+        tripleo::profile::base::pacemaker::remote_authkey: {get_param: PacemakerRemoteAuthkey}
+      service_config_settings:
+        fluentd:
+          tripleo_fluentd_groups_pacemaker:
+            - haclient
+          tripleo_fluentd_sources_pacemaker:
+            - {get_param: PacemakerLoggingSource}
       step_config: |
         include ::tripleo::profile::base::pacemaker
+      upgrade_tasks:
+        - name: Check pacemaker cluster running before upgrade
+          when: step|int == 0
+          tags: validation
+          pacemaker_cluster: state=online check_and_fail=true
+          async: 30
+          poll: 4
+        - name: Stop pacemaker cluster
+          when: step|int == 2
+          pacemaker_cluster: state=offline
+        - name: Start pacemaker cluster
+          when: step|int == 4
+          pacemaker_cluster: state=online
+      update_tasks:
+        - name: Check pacemaker cluster running before the minor update
+          when: step|int == 0  # TODO(marios) disabling validations?
+          pacemaker_cluster: state=online check_and_fail=true
+          async: 30
+          poll: 4
+        - name: Stop pacemaker cluster
+          when: step|int == 1
+          pacemaker_cluster: state=offline
+        - name: Start pacemaker cluster
+          when: step|int == 4
+          pacemaker_cluster: state=online

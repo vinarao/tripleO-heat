@@ -1,3 +1,7 @@
+# ******************************************************************************
+# DEPRECATED: Use tripleo-heat-templates/environments/storage/external-ceph.yaml
+# instead.
+# ******************************************************************************
 # A Heat environment file which can be used to enable the
 # use of an externally managed Ceph cluster.
 resource_registry:
@@ -23,12 +27,16 @@ parameter_defaults:
   # following as needed.
   NovaRbdPoolName: vms
   CinderRbdPoolName: volumes
+  CinderBackupRbdPoolName: backups
   GlanceRbdPoolName: images
   GnocchiRbdPoolName: metrics
   CephClientUserName: openstack
 
   # finally we disable the Cinder LVM backend
   CinderEnableIscsiBackend: false
+
+  # Uncomment if connecting to a pre-Jewel or RHCS1.3 Ceph Cluster
+  # RbdDefaultFeatures: 1
 
   # Backward compatibility setting, will be removed in the future
   CephAdminKey: ''

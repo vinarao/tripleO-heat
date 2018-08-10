@@ -1,21 +1,25 @@
-heat_template_version: 2016-10-14
+heat_template_version: queens
 description: 'All Hosts Config'
 
 parameters:
   hosts:
-    type: comma_delimited_list
+    type: string
 
 resources:
 
   hostsConfigImpl:
-    type: OS::Heat::StructuredConfig
+    type: OS::Heat::SoftwareConfig
     properties:
-      group: os-apply-config
-      config:
-        hosts:
-          list_join:
-          - "\n"
-          - {get_param: hosts}
+      group: script
+      inputs:
+        - name: hosts
+          default:
+            list_join:
+              - ' '
+              - str_split:
+                - '\n'
+                - {get_param: hosts}
+      config: {get_file: scripts/hosts-config.sh}
 
 outputs:
   config_id:
@@ -27,4 +31,7 @@ outputs:
       The content that should be appended to your /etc/hosts if you want to get
       hostname-based access to the deployed nodes (useful for testing without
       setting up a DNS).
-    value: {get_attr: [hostsConfigImpl, config, hosts]}
+    value: {get_param: hosts}
+  OS::stack_id:
+    description: The ID of the hostsConfigImpl resource.
+    value: {get_resource: hostsConfigImpl}

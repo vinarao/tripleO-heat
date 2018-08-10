@@ -1,5 +1,5 @@
 This directory contains Heat templates to help configure
-Vlans on a bonded pair of NICs for each Overcloud role.
+VLANs on a bonded pair of NICs for each Overcloud role.
 
 There are two versions of the controller role template, one with
 an external network interface, and another without. If the
@@ -33,17 +33,24 @@ Same as above except set the following value for the controller role:
 Configuration with System Management Network
 --------------------------------------------
 
-To enable the optional System Management network, create a Heat environment
-that looks something like this:
+The Management network is enabled for backwards-compatibility, but
+is not included in any roles by default. To enable the optional System
+Management network, create a Heat environment that looks something like
+this:
 
   resource\_registry:
     OS::TripleO::Network::Management: ../network/management.yaml
     OS::TripleO::Controller::Ports::ManagementPort: ../network/ports/management.yaml
     OS::TripleO::Compute::Ports::ManagementPort: ../network/ports/management.yaml
     OS::TripleO::CephStorage::Ports::ManagementPort: ../network/ports/management.yaml
-    OS::TripleO::SwiftStorage::Ports::ManagementPort: ../network/ports/management.yaml
+    OS::TripleO::ObjectStorage::Ports::ManagementPort: ../network/ports/management.yaml
     OS::TripleO::BlockStorage::Ports::ManagementPort: ../network/ports/management.yaml
 
 Or use this Heat environment file:
 
   environments/network-management.yaml
+
+Or, add the network to the list of networks used by each role in the role
+definition file (e.g. roles_data.yaml). Refer to installation documentation
+for procedure to generate a role file for custom roles.
+

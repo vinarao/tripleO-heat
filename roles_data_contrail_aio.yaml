@@ -8,7 +8,7 @@
   description: |
     Controller role that has all the controler services loaded and handles
     Database, Messaging and Network functions.
-  CountDefault: 1
+  CountDefault: 0
   tags:
     - primary
     - controller
@@ -265,7 +265,7 @@
 - name: ContrailDpdk
   description: |
     Contrail Dpdk Node role
-  CountDefault: 1
+  CountDefault: 0 
   tags:
     - contraildpdk
   networks:
@@ -316,7 +316,7 @@
 - name: ContrailSriov
   description: |
     Contrail Sriov Node role
-  CountDefault: 1
+  CountDefault: 0 
   tags:
     - contrailsriov
   networks:
